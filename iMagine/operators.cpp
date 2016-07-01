@@ -12,7 +12,7 @@ Mat operators::edgeDetect(Mat src)
     
     cvtColor(src, grey, CV_BGR2GRAY);
     
-    Canny(grey, edge, 20, 200, 3);
+    Canny(grey, edge, 50, 100, 3);
     
     edge.convertTo(draw, CV_8U);
     return draw;
@@ -33,6 +33,7 @@ Mat operators::gblur(Mat src, int kernLength)
 void operators::help() {
     cout << "\n     COMMANDS:" << endl
     << " help ...................... Opens help menu " << endl
+    << " cam ....................... Edge detects feed from webcam " << endl
     << " open ...................... Opens loaded image " << endl
     << " new ....................... Load a new image " << endl
     << " edge ...................... Find edges with Canny operator " << endl
@@ -40,7 +41,7 @@ void operators::help() {
     //		<< " save ...................... Save the current image" << endl
     << " bye ....................... Exit imProc" << endl
     
-    << "\n imProc is created by Corey Brooks, UBC computer engineering." << endl
+    << "\n iMagine is created by Corey Brooks, UBC computer engineering." << endl
     << "\n\n";
 }
 

@@ -15,14 +15,16 @@ using namespace cv;
 using namespace std;
 
 
-// ------------------------------------------------------------------------------------------------------- //
+// -------------------------------------------------------------------------------------------------------
+// ----------------------------------------------- iMagine -----------------------------------------------
+// -------------------------------------------------------------------------------------------------------
+
 
 int main(int argc, char** argv)
 {
     
     Mat image, edge;
     String command;
-    
     
     if (argc != 2)
     {
@@ -46,56 +48,81 @@ int main(int argc, char** argv)
     
     cout << " For help, type 'help' \n" << endl;
     
-    cvNamedWindow ("Capture", CV_WINDOW_AUTOSIZE);
-    CvCapture *capture = cvCreateCameraCapture(0);
 
-    // Input from webcam is traced and output to screen
-    while (1)
-    {
-    image = cvQueryFrame (capture);
-    edge = operators::edgeDetect(operators::gblur(image, 5));
-    imshow("Capture", edge);
-    }
     
+    Mat gray;
+    int flag;
     
     while (cin >> command)
     {
         
-        if (!command.compare("open"))
+        if(!command.compare("cam"))
         {
-            namedWindow(argv[1], CV_WINDOW_NORMAL);
-            imshow(argv[1], edge);				    // open image in separate window
-            waitKey(0);								// window stays up until key is pressed
-            destroyWindow(argv[1]);
+            cvNamedWindow ("From Webcam", CV_WINDOW_AUTOSIZE);
+            CvCapture *capture = cvCreateCameraCapture(0);
+            cvStartWindowThread();
+            
+            while (cvWaitKey(10) != 27)
+            {
+                image = cvQueryFrame (capture);
+                edge = operators::edgeDetect(operators::gblur(image, 7));
+                
+                cvtColor(image, gray, CV_BGR2GRAY);
+                imshow("From Webcam", edge);
+                
+  
+                flag = cvWaitKey(30);
+                if (flag == 27) {                   // esc
+                    cvDestroyWindow("From Webcam");
+                    cvWaitKey(5);
+                    break;
+                }
+            }
+            
         }
         
-        else if (!command.compare("help"))
-            operators::help(); // Display help messages
+        // TODO: green light near webcam stays lit after exited out of cam (?)
+        
+        if (!command.compare("open"))               // open loaded image
+        {
+            cvStartWindowThread();
+            namedWindow(argv[1], CV_WINDOW_NORMAL);
+            imshow(argv[1], image);				    // open image in separate window
+            if(waitKey(0)==27){					// window stays up until esc key is pressed
+                destroyWindow(argv[1]);
+                waitKey(10);
+            }
+        }
+        
+        else if (!command.compare("help"))          // Display help messages
+            operators::help();
         
         else if (!command.compare("new"))
             cout << " Function not yet implemented" << endl;
         
-        else if (!command.compare("gblur")) // Gaussian blur
+        else if (!command.compare("gblur"))         // Gaussian blur
         {
             int kern_lth = 16;
-            
+            cvStartWindowThread();
+
             Mat gaussIm = operators::gblur(image, kern_lth);
             
             namedWindow("Original", CV_WINDOW_NORMAL);
             imshow("Original", image);
             
             namedWindow("Blurred", CV_WINDOW_NORMAL);
-            imshow("Blurred", gaussIm);				    // open image in separate window
+            imshow("Blurred", gaussIm);				 // open image in separate window
             
-            waitKey(0);
+            if(waitKey(0)==27){					// window stays up until esc key is pressed
             destroyWindow("Original");
             destroyWindow("Blurred");
-            
+            waitKey(10ß)
+            }
         }
         
-        else if (!command.compare("edge")) // Canny edge detection
+        else if (!command.compare("edge"))           // Canny edge detection
         {
-            Mat edgeIm = operators::edgeDetect(operators::gblur(image, 8));
+            Mat edgeIm = operators::edgeDetect(operators::gblur(image, 7));
             
             namedWindow("Original", CV_WINDOW_NORMAL);
             imshow("Original", image);
@@ -103,9 +130,10 @@ int main(int argc, char** argv)
             namedWindow("Edge", CV_WINDOW_NORMAL);
             imshow("Edge", edgeIm);
             
-            waitKey(0);
-            destroyWindow("Original");
-            destroyWindow("Edge");
+            if(waitKey(0)==27){					// window stays up until esc key is pressed
+                destroyWindow("Original");
+                destroyWindow("Edge");
+                waitKey(10);
         }
         
         else if (!command.compare("close")){
