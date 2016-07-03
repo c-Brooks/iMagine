@@ -50,36 +50,79 @@ int main(int argc, char** argv)
     
 
     
-    Mat gray;
+    Mat gray, hsv, thresh;
     int flag;
+    int h_min, h_max, s_min, s_max, v_min, v_max;
+    
     
     while (cin >> command)
     {
         
         if(!command.compare("cam"))
         {
-            cvNamedWindow ("From Webcam", CV_WINDOW_AUTOSIZE);
+            cvNamedWindow ("HSV", CV_WINDOW_AUTOSIZE);
+            cvNamedWindow ("Thresholds", CV_WINDOW_AUTOSIZE);
+            cvNamedWindow ("Threshold Image", CV_WINDOW_AUTOSIZE);
+
             CvCapture *capture = cvCreateCameraCapture(0);
             cvStartWindowThread();
             
             while (cvWaitKey(10) != 27)
             {
                 image = cvQueryFrame (capture);
-                edge = operators::edgeDetect(operators::gblur(image, 7));
+                cvtColor(image, hsv, CV_BGR2HSV);
+             //   edge = operators::edgeDetect(operators::gblur(hsv, 7));
                 
-                cvtColor(image, gray, CV_BGR2GRAY);
-                imshow("From Webcam", edge);
-                
+//                imshow("HSV", hsv);
   
+                cvCreateTrackbar("Min Hue", "Thresholds", &h_min, 255);
+                cvCreateTrackbar("Max Hue", "Thresholds", &h_max, 255);
+                cvCreateTrackbar("Min Sat", "Thresholds", &s_min, 255);
+                cvCreateTrackbar("Max Sat", "Thresholds", &s_max, 255);
+                cvCreateTrackbar("Min Val", "Thresholds", &v_min, 255);
+                cvCreateTrackbar("Max Val", "Thresholds", &v_max, 255);
+
+                inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
+                imshow("Threshold Image", thresh);
+                
+                
+                
+                
                 flag = cvWaitKey(30);
                 if (flag == 27) {                   // esc
-                    cvDestroyWindow("From Webcam");
+                    cvDestroyAllWindows();
                     cvWaitKey(5);
                     break;
                 }
             }
             
         }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         // TODO: green light near webcam stays lit after exited out of cam (?)
         
@@ -114,9 +157,9 @@ int main(int argc, char** argv)
             imshow("Blurred", gaussIm);				 // open image in separate window
             
             if(waitKey(0)==27){					// window stays up until esc key is pressed
-            destroyWindow("Original");
-            destroyWindow("Blurred");
-            waitKey(10ß)
+                destroyWindow("Original");
+                destroyWindow("Blurred");
+                waitKey(10);
             }
         }
         
@@ -130,7 +173,7 @@ int main(int argc, char** argv)
             namedWindow("Edge", CV_WINDOW_NORMAL);
             imshow("Edge", edgeIm);
             
-            if(waitKey(0)==27){					// window stays up until esc key is pressed
+            if(waitKey(0)==27){                     // window stays up until esc key is pressed
                 destroyWindow("Original");
                 destroyWindow("Edge");
                 waitKey(10);
@@ -149,4 +192,5 @@ int main(int argc, char** argv)
     }
     destroyAllWindows();
     return 0;
+}
 }
