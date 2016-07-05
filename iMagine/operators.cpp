@@ -38,8 +38,7 @@ void operators::help() {
     << " new ....................... Load a new image " << endl
     << " edge ...................... Find edges with Canny operator " << endl
     << " gblur ..................... Gaussian blur " << endl
-    //		<< " save ...................... Save the current image" << endl
-    << " bye ....................... Exit imProc" << endl
+    << " bye ....................... Exit iMagine" << endl
     
     << "\n iMagine is created by Corey Brooks, UBC computer engineering." << endl
     << "\n\n";
@@ -47,9 +46,41 @@ void operators::help() {
 
 const string keys =
 "{                   |                   |                   }"
-"{ help h about ?    |                   |                   }"
+"{ help h about ?    |                   |                   }";
+
+// Used for tracking objects
+// Draws a circle and coordinates
+void operators::drawCircle(int x, int y, Mat &frame)
+{
+    putText(frame, "["+to_string(x)+", "+to_string(y)+"]", Point(x,y), 1, 1, Scalar(0,255,0));
+    circle(frame, Point(x,y), 20, Scalar(0,0,255));
+}
 
 
 
 
-;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

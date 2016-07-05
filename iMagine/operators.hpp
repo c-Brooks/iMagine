@@ -22,6 +22,7 @@ private:
 public:
     static Mat edgeDetect(Mat src);
     static Mat gblur(Mat src, int kernLength);
+    static void drawCircle(int x, int y, Mat &frame);
     static void help();
 };
 #endif // End operators.h
