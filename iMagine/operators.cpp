@@ -50,10 +50,14 @@ const string keys =
 
 // Used for tracking objects
 // Draws a circle and coordinates
-void operators::drawCircle(int x, int y, Mat &frame)
+void operators::drawCircle(int x, int y, double area, Mat &frame)
 {
+    // Get radius of circle from area
+    int radius = sqrt(area) * 0.5624;
+    
+    // Draw the tracker
     putText(frame, "["+to_string(x)+", "+to_string(y)+"]", Point(x,y), 1, 1, Scalar(0,255,0));
-    circle(frame, Point(x,y), 20, Scalar(0,0,255));
+    circle(frame, Point(x,y), radius, Scalar(0,0,255));
 }
 
 
