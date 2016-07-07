@@ -11,7 +11,9 @@
 
 #include "operators.hpp"
 
-#define MAX_THRESHOLD 255
+#define MAX_THRESHOLD_HUE 179
+#define MAX_THRESHOLD_SAT 255
+#define MAX_THRESHOLD_VAL 255
 
 using namespace cv;
 using namespace std;
@@ -27,22 +29,9 @@ int main(int argc, char** argv)
     
     Mat image, edge;
     String command;
+
     
-    if (argc != 2)
-    {
-        cerr << "\n\n Error: no argument specified" << endl;
-        return -1;
-    }
-    
-    image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-    
-    if (!image.data)
-    {
-        cerr << "\n  Could not open or find the image" << endl;
-        return -1;
-    }
-    else cout << " Succesfully loaded " << argv[1] << endl;
-    
+     
     cout << "\n ----------------------------------------" << endl
     <<   " --------- Welcome to iMagine -----------" << endl
     <<   " ----------------------------------------" << endl;
@@ -53,7 +42,7 @@ int main(int argc, char** argv)
     
     
     Mat gray, hsv, thresh, imFinal;
-    int h_min = 0, h_max = 179, s_min = 0, s_max = MAX_THRESHOLD, v_min = 0, v_max = MAX_THRESHOLD;
+    int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL;
     Mat erodeElem  = getStructuringElement(MORPH_RECT, Size(3,3));
     Mat dilateElem = getStructuringElement(MORPH_RECT, Size(8,8));
     
@@ -82,18 +71,20 @@ int main(int argc, char** argv)
                 image = cvQueryFrame (capture);
                 cvtColor(image, hsv, CV_BGR2HSV);
                 
-                cvCreateTrackbar("Min Hue", "Thresholds", &h_min, 179);
-                cvCreateTrackbar("Max Hue", "Thresholds", &h_max, 179);
-                cvCreateTrackbar("Min Sat", "Thresholds", &s_min, MAX_THRESHOLD);
-                cvCreateTrackbar("Max Sat", "Thresholds", &s_max, MAX_THRESHOLD);
-                cvCreateTrackbar("Min Val", "Thresholds", &v_min, MAX_THRESHOLD);
-                cvCreateTrackbar("Max Val", "Thresholds", &v_max, MAX_THRESHOLD);
+                // TODO: Make trackbars look nicer
+                
+                cvCreateTrackbar("Min Hue", "Thresholds", &h_min, MAX_THRESHOLD_HUE);
+                cvCreateTrackbar("Max Hue", "Thresholds", &h_max, MAX_THRESHOLD_HUE);
+                cvCreateTrackbar("Min Sat", "Thresholds", &s_min, MAX_THRESHOLD_SAT);
+                cvCreateTrackbar("Max Sat", "Thresholds", &s_max, MAX_THRESHOLD_SAT);
+                cvCreateTrackbar("Min Val", "Thresholds", &v_min, MAX_THRESHOLD_VAL);
+                cvCreateTrackbar("Max Val", "Thresholds", &v_max, MAX_THRESHOLD_VAL);
                 
                 inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
                 
                 imshow("Threshold Image", thresh);
                 
-                if (cvWaitKey(30) == 27) {                   // esc
+                if (cvWaitKey(10) == 27) {                   // esc
                     cvDestroyAllWindows();
                     cvWaitKey(10);
                     break;
@@ -111,6 +102,7 @@ int main(int argc, char** argv)
         while(1)
         {
             image = cvQueryFrame (capture);
+            flip(image, image, 1);
             cvtColor(image, hsv, CV_BGR2HSV);
 
             inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
@@ -124,7 +116,7 @@ int main(int argc, char** argv)
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
-            if(numObj > 0 && numObj < 200) // more than 200 -> noisy image
+            if(numObj > 0)// && numObj < 100) // more than 100 -> noisy image
             {
                 for(int i = 0; i < numObj; i++)
                 {
@@ -146,13 +138,83 @@ int main(int argc, char** argv)
             areaMax = 0.0;
             
             
-            if (cvWaitKey(30) == 27) {                   // esc
+            if (cvWaitKey(10) == 27) {                   // esc
                 cvDestroyAllWindows();
                 cvWaitKey(10);
                 break;
             }
         }
     }
+        // DRAW
+        //  Uses the tracked object as a pen
+        //  Press spacebar to clear lines
+        
+    else if(!command.compare("draw"))
+    {
+        cvNamedWindow ("Drawing", CV_WINDOW_AUTOSIZE);
+        int newX = -1, newY = -1;
+        Mat imgTemp;
+        Mat lines = Mat::zeros(image.size(), CV_8UC3);
+        
+        while(cvWaitKey(10) != 27)
+        {
+            
+            
+            image = cvQueryFrame (capture);
+            flip(image, image, 1);
+            cvtColor(image, hsv, CV_BGR2HSV);
+            
+            inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
+            
+            dilate(thresh, imFinal, dilateElem);
+            erode(imFinal, imFinal, erodeElem);
+            
+            erode(imFinal, imFinal, erodeElem);
+            dilate(imFinal, imFinal, dilateElem);
+            
+            findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+            int numObj = (int) hierarchy.size();
+            
+            if(numObj > 0)// && numObj < 100) // more than 100 -> noisy image
+            {
+                for(int i = 0; i < numObj; i++)
+                {
+                    moment = moments((Mat)countours[i]);
+                    area = moment.m00;
+                    
+                    // Find the largest area of white pixels
+                    if(area > 400  && area > areaMax)
+                    {
+                        newX = moment.m10/area;
+                        newY = moment.m01/area;
+                        areaMax = area;
+                    }
+                }
+            }
+            if( newX > 0 && newY > 0 && x > 0 && y > 0
+               && abs(x-newX) < 1023 && abs(y-newY) < 1023 )
+                line(lines, Point(x,y), Point(newX, newY), Scalar(0,0,255), 2);
+                
+                x = newX;
+                y = newY;
+            
+            imgTemp = image + lines;
+            imshow("Drawing", imgTemp);
+            areaMax = 0.0;
+            
+            if (cvWaitKey(10) == 32) {                 // spacebar
+                lines.release();
+                newX = -1, newY = -1;
+            }
+
+            
+        }
+        destroyAllWindows();
+        waitKey(10);
+    }
+
+        
+        
 
             else if (!command.compare("close")){
                 destroyAllWindows();

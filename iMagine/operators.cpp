@@ -30,30 +30,25 @@ Mat operators::gblur(Mat src, int kernLength)
     return dst;
 }
 
+// Displays help menu
 void operators::help() {
     cout << "\n     COMMANDS:" << endl
     << " help ...................... Opens help menu " << endl
-    << " cam ....................... Edge detects feed from webcam " << endl
-    << " open ...................... Opens loaded image " << endl
-    << " new ....................... Load a new image " << endl
-    << " edge ...................... Find edges with Canny operator " << endl
-    << " gblur ..................... Gaussian blur " << endl
+    << " set ....................... Set hue, saturation, and value for object detection. " << endl
+    << " track ..................... Tracks an object on webcam feed based on set. " << endl
+    << " draw ...................... Draws from the tracked object. Spacebar to clear drawing. " << endl
     << " bye ....................... Exit iMagine" << endl
     
     << "\n iMagine is created by Corey Brooks, UBC computer engineering." << endl
     << "\n\n";
 }
 
-const string keys =
-"{                   |                   |                   }"
-"{ help h about ?    |                   |                   }";
-
 // Used for tracking objects
 // Draws a circle and coordinates
 void operators::drawCircle(int x, int y, double area, Mat &frame)
 {
     // Get radius of circle from area
-    int radius = sqrt(area) * 0.5624;
+    int radius = sqrt(area) * 0.5624; // r = sqrt(area/pi)
     
     // Draw the tracker
     putText(frame, "["+to_string(x)+", "+to_string(y)+"]", Point(x,y), 1, 1, Scalar(0,255,0));
