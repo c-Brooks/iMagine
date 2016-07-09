@@ -2,8 +2,15 @@
 #include "operators.hpp"
 #include <opencv/cv.h>
 
+
+
+
 using namespace cv;
 using namespace std;
+
+
+
+CascadeClassifier face_cascade( "/Users/corey/Downloads/frontalFace10/haarcascade_frontalface_alt_tree.xml" );
 
 // Edge detection using Canny operator
 Mat operators::edgeDetect(Mat src)
@@ -43,6 +50,24 @@ void operators::help() {
     << "\n\n";
 }
 
+// Morphological operations to prepare binary input image for tracking
+// Uses dilate and erode supplied by openCV
+Mat operators::morphOps(Mat src){
+    
+    Mat erodeElem  = getStructuringElement(MORPH_RECT, Size(3,3));
+    Mat dilateElem = getStructuringElement(MORPH_RECT, Size(8,8));
+    
+    dilate(src, src, dilateElem);
+    erode(src, src, erodeElem);
+    
+    erode(src, src, erodeElem);
+    dilate(src, src, dilateElem);
+    
+    return src;
+}
+
+
+
 // Used for tracking objects
 // Draws a circle and coordinates
 void operators::drawCircle(int x, int y, double area, Mat &frame)
@@ -56,29 +81,26 @@ void operators::drawCircle(int x, int y, double area, Mat &frame)
 }
 
 
+// Face detection using a prebuilt xml cascade file
+// Returns the image with elipses superimposed over the faces.
+Mat operators::detectFace(Mat image)
+{
+    // Load Face cascade (.xml file)
+//    CascadeClassifier face_cascade( "/Users/corey/Downloads/frontalFace10/haarcascade_frontalface_alt_tree.xml" );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    // Detect faces
+    std::vector<Rect> faces;
+    face_cascade.detectMultiScale( image, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+    
+    // Draw circles on the detected faces
+    for( int i = 0; i < faces.size(); i++ )
+    {
+        Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+        ellipse( image, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+    }
+    return image;
+}
 
 
 

@@ -24,6 +24,14 @@ using namespace std;
 // -------------------------------------------------------------------------------------------------------
 
 
+/*  TODO:
+ *      When tracking, discourage "jumps" of object -> weighted area  = area / DELTA_P
+ *      Fix the bug where trackbars freeze the program
+ *      Keep drawing after draw is erased
+ */
+
+
+
 int main(int argc, char** argv)
 {
     
@@ -31,10 +39,10 @@ int main(int argc, char** argv)
     String command;
 
     
-     
+    
     cout << "\n ----------------------------------------" << endl
-    <<   " --------- Welcome to iMagine -----------" << endl
-    <<   " ----------------------------------------" << endl;
+         <<   " --------- Welcome to iMagine -----------" << endl
+         <<   " ----------------------------------------" << endl;
     
     
     cout << " For help, type 'help' \n" << endl;
@@ -43,9 +51,7 @@ int main(int argc, char** argv)
     
     Mat gray, hsv, thresh, imFinal;
     int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL;
-    Mat erodeElem  = getStructuringElement(MORPH_RECT, Size(3,3));
-    Mat dilateElem = getStructuringElement(MORPH_RECT, Size(8,8));
-    
+
     vector<vector<Point>> countours;
     vector<Vec4i> hierarchy;
     Moments moment;
@@ -107,12 +113,8 @@ int main(int argc, char** argv)
 
             inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
             
-            dilate(thresh, imFinal, dilateElem);
-            erode(imFinal, imFinal, erodeElem);
-            
-            erode(imFinal, imFinal, erodeElem);
-            dilate(imFinal, imFinal, dilateElem);
-            
+            imFinal = operators::morphOps(thresh);
+
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
@@ -122,6 +124,7 @@ int main(int argc, char** argv)
                 {
                     moment = moments((Mat)countours[i]);
                     area = moment.m00;
+                    
                     
                     if(area > 400  && area > areaMax)
                     {
@@ -158,20 +161,15 @@ int main(int argc, char** argv)
         
         while(cvWaitKey(10) != 27)
         {
-            
-            
             image = cvQueryFrame (capture);
             flip(image, image, 1);
             cvtColor(image, hsv, CV_BGR2HSV);
             
             inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
             
-            dilate(thresh, imFinal, dilateElem);
-            erode(imFinal, imFinal, erodeElem);
+            imFinal = operators::morphOps(thresh);
             
-            erode(imFinal, imFinal, erodeElem);
-            dilate(imFinal, imFinal, dilateElem);
-            
+        
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
@@ -192,11 +190,13 @@ int main(int argc, char** argv)
                 }
             }
             if( newX > 0 && newY > 0 && x > 0 && y > 0
-               && abs(x-newX) < 1023 && abs(y-newY) < 1023 )
+               && abs(x-newX) < 200 && abs(y-newY) < 100 ) // To prevent jumps
+            {
                 line(lines, Point(x,y), Point(newX, newY), Scalar(0,0,255), 2);
                 
                 x = newX;
                 y = newY;
+            }
             
             imgTemp = image + lines;
             imshow("Drawing", imgTemp);
@@ -206,13 +206,31 @@ int main(int argc, char** argv)
                 lines.release();
                 newX = -1, newY = -1;
             }
-
-            
         }
         destroyAllWindows();
         waitKey(10);
     }
 
+        // Face Detection using Haar Cascade
+        
+        else if (!command.compare("face") || !command.compare("faces"))
+        {
+            cvNamedWindow ("Faces", CV_WINDOW_AUTOSIZE);
+
+            while(cvWaitKey(10) != 27)
+            {
+                image = cvQueryFrame (capture);
+                flip(image, image, 1);
+
+                image = operators::detectFace(image);
+                imshow("Faces", image);
+            }
+            destroyAllWindows();
+            waitKey(10);
+        }
+        
+        
+        
         
         
 

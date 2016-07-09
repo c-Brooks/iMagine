@@ -45,7 +45,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		04F270D31D24419F0035071E /* iMagine */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; name = iMagine; path = /Users/corey/Desktop/iMagine/build/Debug/iMagine; sourceTree = "<absolute>"; };
+		04AD54A91D2DB24E00514913 /* iMagine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = iMagine; sourceTree = BUILT_PRODUCTS_DIR; };
+		04AD54AB1D3028D800514913 /* haarcascade_frontalface_alt_tree.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_frontalface_alt_tree.xml; sourceTree = "<group>"; };
 		04F270D61D24419F0035071E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
 		04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
@@ -108,6 +109,7 @@
 		04F270CA1D24419F0035071E = {
 			isa = PBXGroup;
 			children = (
+				04AD54AB1D3028D800514913 /* haarcascade_frontalface_alt_tree.xml */,
 				04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,
 				04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,
 				04F270DF1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,
@@ -138,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				04F2710B1D2466050035071E /* iMagine */,
+				04AD54A91D2DB24E00514913 /* iMagine */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,7 +172,7 @@
 			);
 			name = iMagine;
 			productName = iMagine;
-			productReference = 04F270D31D24419F0035071E /* iMagine */;
+			productReference = 04AD54A91D2DB24E00514913 /* iMagine */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -347,6 +350,7 @@
 				04F270DC1D24419F0035071E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
