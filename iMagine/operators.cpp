@@ -9,7 +9,7 @@ using namespace cv;
 using namespace std;
 
 
-
+// Load Face cascade (.xml file)
 CascadeClassifier face_cascade( "/Users/corey/Downloads/frontalFace10/haarcascade_frontalface_alt_tree.xml" );
 
 // Edge detection using Canny operator
@@ -85,10 +85,6 @@ void operators::drawCircle(int x, int y, double area, Mat &frame)
 // Returns the image with elipses superimposed over the faces.
 Mat operators::detectFace(Mat image)
 {
-    // Load Face cascade (.xml file)
-//    CascadeClassifier face_cascade( "/Users/corey/Downloads/frontalFace10/haarcascade_frontalface_alt_tree.xml" );
-
-    
     // Detect faces
     std::vector<Rect> faces;
     face_cascade.detectMultiScale( image, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );

@@ -10,6 +10,24 @@
 #include <iostream>
 
 #include "operators.hpp"
+/*
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/graph.pb.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/graph/default_device.h"
+#include "tensorflow/core/graph/graph_def_builder.h"
+#include "tensorflow/core/lib/core/threadpool.h"
+#include "tensorflow/core/lib/strings/stringprintf.h"
+#include "tensorflow/core/platform/init_main.h"
+#include "tensorflow/core/platform/logging.h"
+#include "tensorflow/core/platform/types.h"
+#include "tensorflow/core/public/session.h"
+*/
+
+
+
+
+
 
 #define MAX_THRESHOLD_HUE 179
 #define MAX_THRESHOLD_SAT 255
@@ -134,8 +152,7 @@ int main(int argc, char** argv)
                     }
                 }
             }
-            cout << "Centroid at " << x << ", " << y << endl;
-            
+
             operators::drawCircle(x, y, areaMax, image);
             imshow("Image", image);
             areaMax = 0.0;
@@ -148,6 +165,7 @@ int main(int argc, char** argv)
             }
         }
     }
+        
         // DRAW
         //  Uses the tracked object as a pen
         //  Press spacebar to clear lines
@@ -161,6 +179,7 @@ int main(int argc, char** argv)
         
         while(cvWaitKey(10) != 27)
         {
+                
             image = cvQueryFrame (capture);
             flip(image, image, 1);
             cvtColor(image, hsv, CV_BGR2HSV);
@@ -168,7 +187,6 @@ int main(int argc, char** argv)
             inRange(hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), thresh);
             
             imFinal = operators::morphOps(thresh);
-            
         
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
@@ -189,27 +207,33 @@ int main(int argc, char** argv)
                     }
                 }
             }
-            if( newX > 0 && newY > 0 && x > 0 && y > 0
-               && abs(x-newX) < 200 && abs(y-newY) < 100 ) // To prevent jumps
-            {
-                line(lines, Point(x,y), Point(newX, newY), Scalar(0,0,255), 2);
-                
-                x = newX;
-                y = newY;
-            }
+            if( newX > 0 && newY > 0 && x > 0 && y > 0 )
+              // && abs(x-newX) < 200 && abs(y-newY) < 100 ) // To prevent jumps
+//               && getch() == 32) // getch is for windows
+            
+                line(lines, Point(x,y), Point(newX, newY), Scalar(0,0,255), 2); // draw line from old point to new point
+            
+            // update points
+            x = newX;
+            y = newY;
+            
             
             imgTemp = image + lines;
             imshow("Drawing", imgTemp);
             areaMax = 0.0;
-            
-            if (cvWaitKey(10) == 32) {                 // spacebar
-                lines.release();
-                newX = -1, newY = -1;
+ 
+            if (cvWaitKey(10) == 32) // spacebar - erase lines
+            {
+                lines = Mat::zeros(lines.size(), CV_8UC3);
+                newX = -1;
+                newY = -1;
+   
             }
+  
         }
         destroyAllWindows();
         waitKey(10);
-    }
+        }
 
         // Face Detection using Haar Cascade
         
@@ -217,7 +241,7 @@ int main(int argc, char** argv)
         {
             cvNamedWindow ("Faces", CV_WINDOW_AUTOSIZE);
 
-            while(cvWaitKey(10) != 27)
+            while(cvWaitKey(30) != 27)                  // wait esc for 30ms because more expensive operation
             {
                 image = cvQueryFrame (capture);
                 flip(image, image, 1);
@@ -230,16 +254,15 @@ int main(int argc, char** argv)
         }
         
         
-        
-        
-        
 
             else if (!command.compare("close")){
                 destroyAllWindows();
+                waitKey(10);
             }
             
             else if (!command.compare("bye")){
                 destroyAllWindows();
+                waitKey(10);
                 return 0;
             }
             else
