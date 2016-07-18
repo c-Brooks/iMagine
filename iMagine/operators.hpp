@@ -12,8 +12,10 @@
 #include <stdio.h>
 #include <opencv/cv.h>
 
+
 using namespace std;
 using namespace cv;
+
 
 class operators {
 private:
