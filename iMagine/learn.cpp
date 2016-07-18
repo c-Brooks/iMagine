@@ -12,6 +12,7 @@
 using namespace cv;
 using namespace std;
 
+// TEST
 
 CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
 {
