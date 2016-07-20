@@ -18,6 +18,10 @@ using namespace cv;
 class learn {
 
 public:
+    static void train();
+    static void createClassifier(const string& data_filename, const string& from_file, const string& to_file);
+    static void load_classifier(const string& filename_to_load);
+
     
     
 private:

@@ -3,8 +3,6 @@
 #include <opencv/cv.h>
 
 
-
-
 using namespace cv;
 using namespace std;
 
@@ -67,7 +65,6 @@ Mat operators::morphOps(Mat src){
 }
 
 
-
 // Used for tracking objects
 // Draws a circle and coordinates
 void operators::drawCircle(int x, int y, double area, Mat &frame)
@@ -97,7 +94,3 @@ Mat operators::detectFace(Mat image)
     }
     return image;
 }
-
-
-
-
