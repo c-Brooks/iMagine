@@ -47,7 +47,6 @@
 
 /* Begin PBXFileReference section */
 		04AD54A91D2DB24E00514913 /* iMagine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = iMagine; sourceTree = BUILT_PRODUCTS_DIR; };
-		04AD54AB1D3028D800514913 /* haarcascade_frontalface_alt_tree.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_frontalface_alt_tree.xml; sourceTree = "<group>"; };
 		04CDB7941D3A03660057CE79 /* learn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = learn.cpp; sourceTree = "<group>"; };
 		04CDB7951D3A03660057CE79 /* learn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = learn.hpp; sourceTree = "<group>"; };
 		04F270D61D24419F0035071E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -112,7 +111,6 @@
 		04F270CA1D24419F0035071E = {
 			isa = PBXGroup;
 			children = (
-				04AD54AB1D3028D800514913 /* haarcascade_frontalface_alt_tree.xml */,
 				04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,
 				04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,
 				04F270DF1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */,

@@ -22,6 +22,8 @@ using namespace std;
 // This is a class to train and classify numbers
 // The learning method is Multi-Layered Perceptron, a method that is very effective for text recognition.
 
+/*
+
 CvANN_MLP_TrainParams::CvANN_MLP_TrainParams()
 {
     term_crit = cvTermCriteria( CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 0.01 );
@@ -79,7 +81,7 @@ void learn::createClassifier(const string& data_filename, const string& from_fil
     mlp.create(layers);
     
 
-    /*
+    
     
     cv::Mat response(1, 1, CV_32FC1);
     cv::Mat predicted(testClasses.rows, 1, CV_32F);
@@ -119,7 +121,7 @@ void learn::createClassifier(const string& data_filename, const string& from_fil
     
     
     
-}
+//}
 
 /*
 static CvANN_MLP load_classifier(const string& filename_to_load)

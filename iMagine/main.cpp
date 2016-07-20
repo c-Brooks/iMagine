@@ -34,6 +34,82 @@ using namespace std;
 
 
 
+
+
+
+
+//--------------------------------------------------------------------------------------------
+// --------------------------------------- STOLEN CODE ---------------------------------------
+//--------------------------------------------------------------------------------------------
+
+
+
+bool plotSupportVectors = true;
+int numTrainingPoints = 200;
+int numTestPoints = 2000;
+int size = 200;
+int eq = 0;
+
+
+// plot data and class
+void plot_binary(cv::Mat& data, cv::Mat& classes, string name) {
+    cv::Mat plot(size, size, CV_8UC3);
+    plot.setTo(cv::Scalar(255.0,255.0,255.0));
+    for(int i = 0; i < data.rows; i++) {
+        
+        float x = data.at<float>(i,0) * size;
+        float y = data.at<float>(i,1) * size;
+        
+        if(classes.at<float>(i, 0) > 0) {
+            cv::circle(plot, Point(x,y), 2, CV_RGB(255,0,0),1);
+        } else {
+            cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
+        }
+    }
+    cv::imshow(name, plot);
+}
+
+
+
+// function to learn
+int f(float x, float y, int equation) {
+    switch(equation) {
+        case 0:
+            return y > sin(x*10) ? -1 : 1;
+            break;
+        case 1:
+            return y > cos(x * 10) ? -1 : 1;
+            break;
+        case 2:
+            return y > 2*x ? -1 : 1;
+            break;
+        case 3:
+            return y > tan(x*10) ? -1 : 1;
+            break;
+        default:
+            return y > cos(x*10) ? -1 : 1;
+    }
+}
+
+
+
+// label data with equation
+cv::Mat labelData(cv::Mat points, int equation) {
+    cv::Mat labels(points.rows, 1, CV_32FC1);
+    for(int i = 0; i < points.rows; i++) {
+        float x = points.at<float>(i,0);
+        float y = points.at<float>(i,1);
+        labels.at<float>(i, 0) = f(x, y, equation);
+    }
+    return labels;
+}
+
+//--------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------
+
+
+
 int main(int argc, char** argv)
 {
     
@@ -238,17 +314,23 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("train")){
-            learn::train();
+
+            cv::Mat trainingData(numTrainingPoints, 2, CV_32FC1);
+            cv::Mat testData(numTestPoints, 2, CV_32FC1);
+            
+            cv::randu(trainingData,0,1);
+            cv::randu(testData,0,1);
+            
+            cv::Mat trainingClasses = labelData(trainingData, eq);
+            cv::Mat testClasses = labelData(testData, eq);
+            
+            plot_binary(trainingData, trainingClasses, "Training Data");
+            plot_binary(testData, testClasses, "Test Data");
+
+            
+            
             waitKey(10);
         }
-        
-        
-        
-        
-        
-        
-        
-        
 
             else if (!command.compare("close")){
                 destroyAllWindows();

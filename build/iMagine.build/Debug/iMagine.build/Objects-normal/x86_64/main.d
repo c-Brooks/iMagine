@@ -51,4 +51,6 @@ dependencies: /Users/corey/Desktop/iMagine/iMagine/main.cpp \
   /usr/local/include/opencv2/objdetect/objdetect.hpp \
   /usr/local/include/opencv2/legacy/compat.hpp \
   /usr/local/include/opencv2/core/internal.hpp \
-  /Users/corey/Desktop/iMagine/iMagine/operators.hpp
+  /Users/corey/Desktop/iMagine/iMagine/operators.hpp \
+  /Users/corey/Desktop/iMagine/iMagine/learn.hpp \
+  /usr/local/include/opencv2/ml.hpp /usr/local/include/opencv2/ml/ml.hpp
