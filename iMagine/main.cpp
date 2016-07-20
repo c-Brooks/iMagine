@@ -7,6 +7,8 @@
 
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
+#include <opencv/ml.h>
+
 #include <iostream>
 
 #include "operators.hpp"
@@ -38,17 +40,18 @@ using namespace std;
 
 
 
-//--------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
 // --------------------------------------- STOLEN CODE ---------------------------------------
-//--------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
 
 
 
-bool plotSupportVectors = true;
 int numTrainingPoints = 200;
 int numTestPoints = 2000;
 int size = 200;
-int eq = 0;
+int eq = 2;
+
+
 
 
 // plot data and class
@@ -61,39 +64,82 @@ void plot_binary(cv::Mat& data, cv::Mat& classes, string name) {
         float y = data.at<float>(i,1) * size;
         
         if(classes.at<float>(i, 0) > 0) {
-            cv::circle(plot, Point(x,y), 2, CV_RGB(255,0,0),1);
+            cv::circle(plot, Point(x,y), 2, CV_RGB(180,0,45),1);
         } else {
             cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
         }
     }
-    cv::imshow(name, plot);
+    imshow(name, plot);
 }
+
+
+void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
+    
+    cv::Mat layers = cv::Mat(4, 1, CV_32SC1);
+    
+    layers.row(0) = cv::Scalar(2);
+    layers.row(1) = cv::Scalar(10);
+    layers.row(2) = cv::Scalar(15);
+    layers.row(3) = cv::Scalar(1);
+    
+    CvANN_MLP mlp;
+    CvANN_MLP_TrainParams params;
+    CvTermCriteria criteria;
+    criteria.max_iter = 100;
+    criteria.epsilon = 0.00001f;
+    criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+    params.train_method = CvANN_MLP_TrainParams::BACKPROP;
+    params.bp_dw_scale = 0.05f;
+    params.bp_moment_scale = 0.05f;
+    params.term_crit = criteria;
+    
+    mlp.create(layers);
+    
+    // train
+    mlp.train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
+    
+    cv::Mat response(1, 1, CV_32FC1);
+    cv::Mat predicted(testClasses.rows, 1, CV_32F);
+    for(int i = 0; i < testData.rows; i++) {
+        cv::Mat response(1, 1, CV_32FC1);
+        cv::Mat sample = testData.row(i);
+        
+        mlp.predict(sample, response);
+        predicted.at<float>(i,0) = response.at<float>(0,0);
+    }
+    plot_binary(testData, predicted, "Predictions Backpropagation");
+}
+
+
 
 
 
 // function to learn
 int f(float x, float y, int equation) {
+   /*
     switch(equation) {
         case 0:
-            return y > sin(x*10) ? -1 : 1;
+            return y < sin(x*10) ? -1 : 1;
             break;
         case 1:
-            return y > cos(x * 10) ? -1 : 1;
+            return y < cos(x * 10) ? -1 : 1;
             break;
         case 2:
-            return y > 2*x ? -1 : 1;
+            return y < 2*x ? -1 : 1;
             break;
         case 3:
-            return y > tan(x*10) ? -1 : 1;
+            return y < tan(x*10) ? -1 : 1;
             break;
         default:
-            return y > cos(x*10) ? -1 : 1;
+            return y < cos(x*10) ? -1 : 1;
     }
+    */
+    
+    
+    return ((rand()%100) > 50) ? -1 : 1;
+        
 }
 
-
-
-// label data with equation
 cv::Mat labelData(cv::Mat points, int equation) {
     cv::Mat labels(points.rows, 1, CV_32FC1);
     for(int i = 0; i < points.rows; i++) {
@@ -104,9 +150,33 @@ cv::Mat labelData(cv::Mat points, int equation) {
     return labels;
 }
 
-//--------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------
+
+Mat label2(Mat points){
+    Mat labels(points.rows, 1, CV_32FC1);
+    
+    // Preparing training data
+    Mat image = imread("1.jpg", CV_32FC1);
+    threshold(image, image, 255/2, 255, 0);
+    cvNamedWindow("TEST", CV_WINDOW_AUTOSIZE);
+    imshow("TEST", image);
+
+    for(int i = 0; i < points.rows; i++) {
+        float x = points.at<float>(i,0) * image.rows;
+        float y = points.at<float>(i,1) * image.cols;
+        labels.at<float>(i, 0) = image.at<int>(Point(x,y)) >= 0 ? -1 : 1;
+        cout << Point(x,y) << endl;
+        cout << image.at<int>(Point(x,y)) << endl;
+        
+    }
+    return labels;
+}
+
+
+
+
+// --------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 
 
@@ -313,21 +383,22 @@ int main(int argc, char** argv)
             waitKey(10);
         }
         
-        else if (!command.compare("train")){
+        else if (!command.compare("train") || !command.compare("t")){
 
-            cv::Mat trainingData(numTrainingPoints, 2, CV_32FC1);
-            cv::Mat testData(numTestPoints, 2, CV_32FC1);
+            Mat trainingData(numTrainingPoints, 2, CV_32FC1);
+            Mat testData(numTestPoints, 2, CV_32FC1);
+
+            randu(trainingData,0,1);
+            randu(testData,0,1);
             
-            cv::randu(trainingData,0,1);
-            cv::randu(testData,0,1);
-            
-            cv::Mat trainingClasses = labelData(trainingData, eq);
-            cv::Mat testClasses = labelData(testData, eq);
+            Mat trainingClasses = label2(trainingData);
+            Mat testClasses     = label2(testData);
             
             plot_binary(trainingData, trainingClasses, "Training Data");
+            
             plot_binary(testData, testClasses, "Test Data");
 
-            
+//            mlp(trainingData, trainingClasses, testData, testClasses);
             
             waitKey(10);
         }

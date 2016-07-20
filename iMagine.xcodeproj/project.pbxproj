@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04CDB7961D3A03660057CE79 /* learn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04CDB7941D3A03660057CE79 /* learn.cpp */; };
+		04D8F7A21D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D8F7A11D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib */; };
 		04F270D71D24419F0035071E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F270D61D24419F0035071E /* main.cpp */; };
 		04F270F21D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */; };
 		04F270F31D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */; };
@@ -49,6 +50,8 @@
 		04AD54A91D2DB24E00514913 /* iMagine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = iMagine; sourceTree = BUILT_PRODUCTS_DIR; };
 		04CDB7941D3A03660057CE79 /* learn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = learn.cpp; sourceTree = "<group>"; };
 		04CDB7951D3A03660057CE79 /* learn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = learn.hpp; sourceTree = "<group>"; };
+		04D8F7A11D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libopencv_ml.2.4.13.dylib; sourceTree = "<group>"; };
+		04D8F7A31D40298300F0F1C4 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		04F270D61D24419F0035071E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
 		04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
@@ -98,6 +101,7 @@
 				04F270F61D2454DD0035071E /* libopencv_core.2.4.13.dylib in Frameworks */,
 				04F270FE1D2454DD0035071E /* libopencv_imgproc.2.4.13.dylib in Frameworks */,
 				04F271061D2454DD0035071E /* libopencv_video.2.4.13.dylib in Frameworks */,
+				04D8F7A21D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib in Frameworks */,
 				04F270F91D2454DD0035071E /* libopencv_gpu.2.4.13.dylib in Frameworks */,
 				04F270F71D2454DD0035071E /* libopencv_core.2.4.13.dylib in Frameworks */,
 				04F270FB1D2454DD0035071E /* libopencv_highgui.2.4.13.dylib in Frameworks */,
@@ -119,6 +123,7 @@
 				04F270E21D2454DD0035071E /* libopencv_core.2.4.13.dylib */,
 				04F270E31D2454DD0035071E /* libopencv_gpu.2.4.13.dylib */,
 				04F270E41D2454DD0035071E /* libopencv_gpu.2.4.13.dylib */,
+				04D8F7A11D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib */,
 				04F270E51D2454DD0035071E /* libopencv_gpu.2.4.13.dylib */,
 				04F270E61D2454DD0035071E /* libopencv_highgui.2.4.13.dylib */,
 				04F270E71D2454DD0035071E /* libopencv_highgui.2.4.13.dylib */,
@@ -132,6 +137,7 @@
 				04F270EF1D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
 				04F270F01D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
 				04F270F11D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
+				04D8F7A31D40298300F0F1C4 /* 1.jpg */,
 				04F270D51D24419F0035071E /* iMagine */,
 				04F270D41D24419F0035071E /* Products */,
 			);
@@ -319,7 +325,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -329,7 +338,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
