@@ -48,4 +48,7 @@ dependencies: /Users/corey/Desktop/iMagine/iMagine/operators.cpp \
   /usr/local/include/opencv2/core/affine.hpp \
   /usr/local/include/opencv2/objdetect/objdetect.hpp \
   /usr/local/include/opencv2/legacy/compat.hpp \
-  /usr/local/include/opencv2/core/internal.hpp
+  /usr/local/include/opencv2/core/internal.hpp \
+  /usr/local/include/opencv/highgui.h \
+  /usr/local/include/opencv2/highgui/highgui_c.h \
+  /usr/local/include/opencv2/highgui/highgui.hpp

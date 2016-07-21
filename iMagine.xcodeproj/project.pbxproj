@@ -51,7 +51,6 @@
 		04CDB7941D3A03660057CE79 /* learn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = learn.cpp; sourceTree = "<group>"; };
 		04CDB7951D3A03660057CE79 /* learn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = learn.hpp; sourceTree = "<group>"; };
 		04D8F7A11D4026D200F0F1C4 /* libopencv_ml.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libopencv_ml.2.4.13.dylib; sourceTree = "<group>"; };
-		04D8F7A31D40298300F0F1C4 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
 		04F270D61D24419F0035071E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		04F270DD1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
 		04F270DE1D2454DD0035071E /* libopencv_calib3d.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.2.4.13.dylib; path = ../../../../usr/local/lib/libopencv_calib3d.2.4.13.dylib; sourceTree = "<group>"; };
@@ -137,7 +136,6 @@
 				04F270EF1D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
 				04F270F01D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
 				04F270F11D2454DD0035071E /* libopencv_video.2.4.13.dylib */,
-				04D8F7A31D40298300F0F1C4 /* 1.jpg */,
 				04F270D51D24419F0035071E /* iMagine */,
 				04F270D41D24419F0035071E /* Products */,
 			);
@@ -156,9 +154,9 @@
 			isa = PBXGroup;
 			children = (
 				04F270D61D24419F0035071E /* main.cpp */,
-				04F271071D245BED0035071E /* operators.cpp */,
 				04CDB7941D3A03660057CE79 /* learn.cpp */,
 				04CDB7951D3A03660057CE79 /* learn.hpp */,
+				04F271071D245BED0035071E /* operators.cpp */,
 				04F271081D245BED0035071E /* operators.hpp */,
 			);
 			path = iMagine;

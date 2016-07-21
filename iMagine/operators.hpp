@@ -21,11 +21,12 @@ class operators {
 private:
     static Mat grey, sobelIm;    
 public:
-    static Mat edgeDetect(Mat src);
-    static Mat gblur(Mat src, int kernLength);
+    static Mat  edgeDetect(Mat src);
+    static Mat  gblur(Mat src, int kernLength);
     static void drawCircle(int x, int y, double area, Mat &frame);
     static void help();
-    static Mat morphOps(Mat src);
-    static Mat detectFace(Mat src);
+    static Mat  morphOps(Mat src);
+    static Mat  detectFace(Mat src);
+    static void plot_binary(Mat data, Mat classes, string name);
 };
 #endif // End operators.h

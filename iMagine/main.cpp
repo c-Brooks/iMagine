@@ -37,40 +37,8 @@ using namespace std;
 
 
 
-
-
-
-// -------------------------------------------------------------------------------------------
-// --------------------------------------- STOLEN CODE ---------------------------------------
-// -------------------------------------------------------------------------------------------
-
-
-
-int numTrainingPoints = 200;
-int numTestPoints = 2000;
-int size = 200;
-int eq = 2;
-
-
-
-
-// plot data and class
-void plot_binary(cv::Mat& data, cv::Mat& classes, string name) {
-    cv::Mat plot(size, size, CV_8UC3);
-    plot.setTo(cv::Scalar(255.0,255.0,255.0));
-    for(int i = 0; i < data.rows; i++) {
-        
-        float x = data.at<float>(i,0) * size;
-        float y = data.at<float>(i,1) * size;
-        
-        if(classes.at<float>(i, 0) > 0) {
-            cv::circle(plot, Point(x,y), 2, CV_RGB(180,0,45),1);
-        } else {
-            cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
-        }
-    }
-    imshow(name, plot);
-}
+const int numTrainingPoints = 400;
+const int numTestPoints = 1500;
 
 
 void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
@@ -107,68 +75,7 @@ void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv:
         mlp.predict(sample, response);
         predicted.at<float>(i,0) = response.at<float>(0,0);
     }
-    plot_binary(testData, predicted, "Predictions Backpropagation");
-}
-
-
-
-
-
-// function to learn
-int f(float x, float y, int equation) {
-   /*
-    switch(equation) {
-        case 0:
-            return y < sin(x*10) ? -1 : 1;
-            break;
-        case 1:
-            return y < cos(x * 10) ? -1 : 1;
-            break;
-        case 2:
-            return y < 2*x ? -1 : 1;
-            break;
-        case 3:
-            return y < tan(x*10) ? -1 : 1;
-            break;
-        default:
-            return y < cos(x*10) ? -1 : 1;
-    }
-    */
-    
-    
-    return ((rand()%100) > 50) ? -1 : 1;
-        
-}
-
-cv::Mat labelData(cv::Mat points, int equation) {
-    cv::Mat labels(points.rows, 1, CV_32FC1);
-    for(int i = 0; i < points.rows; i++) {
-        float x = points.at<float>(i,0);
-        float y = points.at<float>(i,1);
-        labels.at<float>(i, 0) = f(x, y, equation);
-    }
-    return labels;
-}
-
-
-Mat label2(Mat points){
-    Mat labels(points.rows, 1, CV_32FC1);
-    
-    // Preparing training data
-    Mat image = imread("1.jpg", CV_32FC1);
-    threshold(image, image, 255/2, 255, 0);
-    cvNamedWindow("TEST", CV_WINDOW_AUTOSIZE);
-    imshow("TEST", image);
-
-    for(int i = 0; i < points.rows; i++) {
-        float x = points.at<float>(i,0) * image.rows;
-        float y = points.at<float>(i,1) * image.cols;
-        labels.at<float>(i, 0) = image.at<int>(Point(x,y)) >= 0 ? -1 : 1;
-        cout << Point(x,y) << endl;
-        cout << image.at<int>(Point(x,y)) << endl;
-        
-    }
-    return labels;
+    operators::plot_binary(testData, predicted, "Predictions");
 }
 
 
@@ -191,8 +98,6 @@ int main(int argc, char** argv)
     cout << "\n ----------------------------------------" << endl
          <<   " --------- Welcome to iMagine -----------" << endl
          <<   " ----------------------------------------" << endl;
-    
-    
     cout << " For help, type 'help' \n" << endl;
     
     
@@ -208,8 +113,7 @@ int main(int argc, char** argv)
     
     while (cin >> command)
     {
-        CvCapture *capture = cvCreateCameraCapture(0);
-        cvStartWindowThread();
+
         
         // SET
         //  Sets the threshold values for HSV image
@@ -217,6 +121,8 @@ int main(int argc, char** argv)
         
         if(!command.compare("set"))
         {
+            CvCapture *capture = cvCreateCameraCapture(0);
+            cvStartWindowThread();
             cvNamedWindow ("Thresholds", CV_WINDOW_AUTOSIZE);
             cvNamedWindow ("Threshold Image", CV_WINDOW_AUTOSIZE);
             
@@ -251,6 +157,8 @@ int main(int argc, char** argv)
         
     else if(!command.compare("track"))
     {
+        CvCapture *capture = cvCreateCameraCapture(0);
+        cvStartWindowThread();
         cvNamedWindow ("Image", CV_WINDOW_AUTOSIZE);
         
         while(1)
@@ -302,6 +210,9 @@ int main(int argc, char** argv)
         
     else if(!command.compare("draw"))
     {
+        CvCapture *capture = cvCreateCameraCapture(0);
+        cvStartWindowThread();
+        
         cvNamedWindow ("Drawing", CV_WINDOW_AUTOSIZE);
         int newX = -1, newY = -1;
         Mat imgTemp;
@@ -369,6 +280,9 @@ int main(int argc, char** argv)
         
         else if (!command.compare("face") || !command.compare("faces"))
         {
+            CvCapture *capture = cvCreateCameraCapture(0);
+            cvStartWindowThread();
+            
             cvNamedWindow ("Faces", CV_WINDOW_AUTOSIZE);
 
             while(cvWaitKey(30) != 27)                  // wait esc for 30ms because more expensive operation
@@ -391,14 +305,14 @@ int main(int argc, char** argv)
             randu(trainingData,0,1);
             randu(testData,0,1);
             
-            Mat trainingClasses = label2(trainingData);
-            Mat testClasses     = label2(testData);
+            Mat trainingClasses = learn::labelData(trainingData);
+            Mat testClasses     = learn::labelData(testData);
             
-            plot_binary(trainingData, trainingClasses, "Training Data");
+            operators::plot_binary(trainingData, trainingClasses, "Training Data");
             
-            plot_binary(testData, testClasses, "Test Data");
+            operators::plot_binary(testData, testClasses, "Test Data");
 
-//            mlp(trainingData, trainingClasses, testData, testClasses);
+            mlp(trainingData, trainingClasses, testData, testClasses);
             
             waitKey(10);
         }

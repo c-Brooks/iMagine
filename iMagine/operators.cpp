@@ -1,6 +1,7 @@
 
 #include "operators.hpp"
 #include <opencv/cv.h>
+#include <opencv/highgui.h>
 
 
 using namespace cv;
@@ -37,14 +38,14 @@ Mat operators::gblur(Mat src, int kernLength)
 
 // Displays help menu
 void operators::help() {
-    cout << "\n     COMMANDS:" << endl
-    << " help ...................... Opens help menu " << endl
-    << " set ....................... Set hue, saturation, and value for object detection. " << endl
-    << " track ..................... Tracks an object on webcam feed based on set. " << endl
+    cout << "\n     COMMANDS:"                                                                   << endl
+    << " help ...................... Opens help menu "                                           << endl
+    << " set ....................... Set hue, saturation, and value for object detection. "      << endl
+    << " track ..................... Tracks an object on webcam feed based on set. "             << endl
     << " draw ...................... Draws from the tracked object. Spacebar to clear drawing. " << endl
-    << " bye ....................... Exit iMagine" << endl
+    << " bye ....................... Exit iMagine"                                               << endl
     
-    << "\n iMagine is created by Corey Brooks, UBC computer engineering." << endl
+    << "\n iMagine is created by Corey Brooks, UBC computer engineering."                        << endl
     << "\n\n";
 }
 
@@ -94,3 +95,28 @@ Mat operators::detectFace(Mat image)
     }
     return image;
 }
+
+
+const int size = 200;
+
+void operators::plot_binary(Mat data, Mat classes, string name) {
+    cv::Mat plot(size, size, CV_8UC3);
+    plot.setTo(cv::Scalar(255.0,255.0,255.0));
+    for(int i = 0; i < data.rows; i++) {
+        
+        float x = data.at<float>(i,0) * size;
+        float y = data.at<float>(i,1) * size;
+        
+        if(classes.at<float>(i, 0) > 0) {
+            cv::circle(plot, Point(x,y), 2, CV_RGB(180,0,45),1);
+        } else {
+            cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
+        }
+    }
+    imshow(name, plot);
+}
+
+
+
+
+

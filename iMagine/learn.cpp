@@ -8,8 +8,9 @@
 
 #include "learn.hpp"
 
-#include <opencv2/ml.hpp>
-#include <opencv2/core.hpp>
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+#include <opencv/ml.h>
 
 #include <cstdio>
 #include <vector>
@@ -18,6 +19,44 @@
 
 using namespace cv;
 using namespace std;
+
+
+
+Mat learn::getData(Mat points){
+    namedWindow("TEST", CV_WINDOW_AUTOSIZE);
+    Mat image = imread("3.jpg", CV_32FC1);
+    threshold(image, image, 100, 255, 0);
+    resize(image, image, Size(points.rows, points.rows));
+    
+    // I don't know why, but I get a segmentation error 11
+    //      if I don't open the image immediately.
+    imshow("TEST", image);
+    destroyWindow("TEST");
+    waitKey(10);
+    
+    return image;
+}
+
+
+
+Mat learn::labelData(Mat points){
+    Mat labels(points.rows, 1, CV_32FC1);
+    Mat image = learn::getData(points);
+    
+    for(int i = 0; i < points.rows; i++) {
+        float x = points.at<float>(i,0) * points.rows;
+        float y = points.at<float>(i,1) * points.rows;
+        labels.at<float>(i, 0) = image.at<int>(Point(x,y)) >= 0 ? -1 : 1;
+        cout << Point(x,y) << endl;
+        cout << image.at<int>(Point(x,y)) << endl;
+        
+    }
+    return labels;
+}
+
+
+
+
 
 // This is a class to train and classify numbers
 // The learning method is Multi-Layered Perceptron, a method that is very effective for text recognition.
