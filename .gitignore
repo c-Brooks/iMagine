@@ -2,3 +2,10 @@
 
 build
 *.xcodeproj
+!.gitignore
+
+
+# IGNORE DIRECTORIES #
+
+build/Release
+build/iMagine.build
