@@ -100,8 +100,8 @@ Mat operators::detectFace(Mat image)
 const int size = 200;
 
 void operators::plot_binary(Mat data, Mat classes, string name) {
-    cv::Mat plot(size, size, CV_8UC3);
-    plot.setTo(cv::Scalar(255.0,255.0,255.0));
+    Mat plot(size, size, CV_8UC3);
+    plot.setTo(Scalar(255.0,255.0,255.0));
     for(int i = 0; i < data.rows; i++) {
         
         float x = data.at<float>(i,0) * size;
@@ -113,6 +113,7 @@ void operators::plot_binary(Mat data, Mat classes, string name) {
             cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
         }
     }
+    namedWindow(name);
     imshow(name, plot);
 }
 

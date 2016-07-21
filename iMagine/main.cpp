@@ -18,6 +18,7 @@
 #define MAX_THRESHOLD_HUE 179
 #define MAX_THRESHOLD_SAT 255
 #define MAX_THRESHOLD_VAL 255
+#define FILENAME "mlp_classifier.xml"
 
 using namespace cv;
 using namespace std;
@@ -37,54 +38,8 @@ using namespace std;
 
 
 
-const int numTrainingPoints = 400;
-const int numTestPoints = 1500;
-
-
-void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
-    
-    cv::Mat layers = cv::Mat(4, 1, CV_32SC1);
-    
-    layers.row(0) = cv::Scalar(2);
-    layers.row(1) = cv::Scalar(10);
-    layers.row(2) = cv::Scalar(15);
-    layers.row(3) = cv::Scalar(1);
-    
-    CvANN_MLP mlp;
-    CvANN_MLP_TrainParams params;
-    CvTermCriteria criteria;
-    criteria.max_iter = 100;
-    criteria.epsilon = 0.00001f;
-    criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
-    params.train_method = CvANN_MLP_TrainParams::BACKPROP;
-    params.bp_dw_scale = 0.05f;
-    params.bp_moment_scale = 0.05f;
-    params.term_crit = criteria;
-    
-    mlp.create(layers);
-    
-    // train
-    mlp.train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
-    
-    cv::Mat response(1, 1, CV_32FC1);
-    cv::Mat predicted(testClasses.rows, 1, CV_32F);
-    for(int i = 0; i < testData.rows; i++) {
-        cv::Mat response(1, 1, CV_32FC1);
-        cv::Mat sample = testData.row(i);
-        
-        mlp.predict(sample, response);
-        predicted.at<float>(i,0) = response.at<float>(0,0);
-    }
-    operators::plot_binary(testData, predicted, "Predictions");
-}
-
-
-
-
-// --------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------
-
+const int numTrainingPoints = 500;
+const int numTestPoints = 1000;
 
 
 int main(int argc, char** argv)
@@ -268,9 +223,7 @@ int main(int argc, char** argv)
                 lines = Mat::zeros(lines.size(), CV_8UC3);
                 newX = -1;
                 newY = -1;
-   
             }
-  
         }
         destroyAllWindows();
         waitKey(10);
@@ -282,7 +235,6 @@ int main(int argc, char** argv)
         {
             CvCapture *capture = cvCreateCameraCapture(0);
             cvStartWindowThread();
-            
             cvNamedWindow ("Faces", CV_WINDOW_AUTOSIZE);
 
             while(cvWaitKey(30) != 27)                  // wait esc for 30ms because more expensive operation
@@ -298,21 +250,26 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("train") || !command.compare("t")){
-
+            
+            // Data contain (x,y) coordinates of random points
+            // Stored as a matrix of 2x(number of data points)
             Mat trainingData(numTrainingPoints, 2, CV_32FC1);
             Mat testData(numTestPoints, 2, CV_32FC1);
 
-            randu(trainingData,0,1);
-            randu(testData,0,1);
+            randu(trainingData,0, 1);
+            randu(testData,0, 1);
             
             Mat trainingClasses = learn::labelData(trainingData);
             Mat testClasses     = learn::labelData(testData);
             
             operators::plot_binary(trainingData, trainingClasses, "Training Data");
-            
             operators::plot_binary(testData, testClasses, "Test Data");
+     
+            
+            Mat predicted = learn::mlp(trainingData, trainingClasses, testData, testClasses);
+            
+            operators::plot_binary(testData, predicted, "Predictions");
 
-            mlp(trainingData, trainingClasses, testData, testClasses);
             
             waitKey(10);
         }
