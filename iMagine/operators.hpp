@@ -28,5 +28,9 @@ public:
     static Mat  morphOps(Mat src);
     static Mat  detectFace(Mat src);
     static void plot_binary(Mat data, Mat classes, string name);
+    static Mat data2plot(Mat data, string name);
+    static Mat plot2data(Mat data, string name);
+
+    
 };
 #endif // End operators.h

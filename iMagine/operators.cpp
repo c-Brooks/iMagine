@@ -97,7 +97,70 @@ Mat operators::detectFace(Mat image)
 }
 
 
-const int size = 200;
+
+
+
+
+
+
+
+const int size   = 200;
+const int thresh = 180;
+
+// Data to Plot
+// Argument: 2xN matrix of x and y coordinates
+// Output: NxN binary matrix (G=255)
+//      Note: this operation also binarizes with a threshold of 180
+
+Mat operators::data2plot(Mat data, string name) {
+    Mat plot(size, size, CV_8UC3);
+    plot.setTo(Scalar(255.0,255.0,255.0));
+    for(int i = 0; i < data.rows; i++) {
+        
+        float x = data.at<float>(i,0) * size;
+        float y = data.at<float>(i,1) * size;
+        
+        if(data.at<float>(i, 0) > 0) {
+            plot.at<float>(x,y) = 255;
+        }
+    }
+    namedWindow(name);
+    imshow(name, plot);
+    return plot;
+}
+
+// Plot to Data
+// Argument: NxN matrix (automatically binarized)
+// Output:   2xN matrix of x and y coordinates
+
+Mat operators::plot2data(Mat plot, string name) {
+    
+    Mat temp;
+    int x, y;
+    vector<int> x_vect, y_vect;
+    int count = 0;
+  //  plot.resize((plot.rows, plot.rows)); // Make into square image
+    plot.setTo(Scalar(255.0,255.0,255.0));
+    for(x = 0; x < plot.rows; x++) {
+        for(y = 0; y < plot.cols; y++){
+            // Goes through every pixel
+        if(plot.at<int>(x,y) > thresh) {
+            x_vect.push_back(x);
+            y_vect.push_back(y);
+        }
+    }
+    }
+    Mat data(count, 2, CV_32FC1);
+    data.row(0) = Mat(x_vect).reshape(0, (int)x_vect.size());
+    data.row(1) = Mat(y_vect).reshape(0, (int)y_vect.size());
+    
+//     namedWindow(name, CV_WINDOW_AUTOSIZE);
+//    imshow(name, data);
+    return data;
+}
+
+
+
 
 void operators::plot_binary(Mat data, Mat classes, string name) {
     Mat plot(size, size, CV_8UC3);
@@ -116,8 +179,6 @@ void operators::plot_binary(Mat data, Mat classes, string name) {
     namedWindow(name);
     imshow(name, plot);
 }
-
-
 
 
 

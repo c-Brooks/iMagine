@@ -7,6 +7,7 @@
 //
 
 #include "learn.hpp"
+#include "operators.hpp"
 
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
@@ -54,7 +55,7 @@ Mat learn::labelData(Mat points){
 
 
 
-Mat learn::mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses) {
+CvANN_MLP learn::create_mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses) {
     
     Mat layers = cv::Mat(4, 1, CV_32SC1);
     
@@ -76,7 +77,6 @@ Mat learn::mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClas
     
     mlp.create(layers);
     
-    
     // train
     mlp.train(trainingData, trainingClasses, Mat(), Mat(), params);
     
@@ -89,7 +89,7 @@ Mat learn::mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClas
         mlp.predict(sample, response);
         predicted.at<float>(i,0) = response.at<float>(0,0);
     }
-    mlp.save("");
-    return predicted;
+    operators::plot_binary(testData, predicted, "Predictions");
+    return mlp;
 }
 

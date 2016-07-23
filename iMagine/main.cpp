@@ -5,6 +5,8 @@
 //  Created by Corey Brooks on 2016-06-29.
 //  Copyright © 2016 Corey Brooks. All rights reserved.
 
+
+
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
 #include <opencv/ml.h>
@@ -18,7 +20,6 @@
 #define MAX_THRESHOLD_HUE 179
 #define MAX_THRESHOLD_SAT 255
 #define MAX_THRESHOLD_VAL 255
-#define FILENAME "mlp_classifier.xml"
 
 using namespace cv;
 using namespace std;
@@ -40,7 +41,12 @@ using namespace std;
 
 const int numTrainingPoints = 500;
 const int numTestPoints = 1000;
+const char* FILENAME =  "mlp_classifier.xml";
+//const string& FILENAME =  "/Users/corey/Desktop/iMagine/mlp_classifier.xml";
 
+string file_to_load = "";
+
+CvANN_MLP mlp;
 
 int main(int argc, char** argv)
 {
@@ -48,14 +54,10 @@ int main(int argc, char** argv)
     Mat image, edge;
     String command;
 
-    
-    
     cout << "\n ----------------------------------------" << endl
          <<   " --------- Welcome to iMagine -----------" << endl
          <<   " ----------------------------------------" << endl;
     cout << " For help, type 'help' \n" << endl;
-    
-    
     
     Mat gray, hsv, thresh, imFinal;
     int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL;
@@ -129,7 +131,7 @@ int main(int argc, char** argv)
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
-            if(numObj > 0)// && numObj < 100) // more than 100 -> noisy image
+            if(numObj > 0)
             {
                 for(int i = 0; i < numObj; i++)
                 {
@@ -187,7 +189,7 @@ int main(int argc, char** argv)
             findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
-            if(numObj > 0)// && numObj < 100) // more than 100 -> noisy image
+            if(numObj > 0)
             {
                 for(int i = 0; i < numObj; i++)
                 {
@@ -203,10 +205,7 @@ int main(int argc, char** argv)
                     }
                 }
             }
-            if( newX > 0 && newY > 0 && x > 0 && y > 0 )
-              // && abs(x-newX) < 200 && abs(y-newY) < 100 ) // To prevent jumps
-//               && getch() == 32) // getch is for windows
-            
+            if( newX > 0 && newY > 0 && x > 0 && y > 0)
                 line(lines, Point(x,y), Point(newX, newY), Scalar(0,0,255), 2); // draw line from old point to new point
             
             // update points
@@ -240,8 +239,9 @@ int main(int argc, char** argv)
             while(cvWaitKey(30) != 27)                  // wait esc for 30ms because more expensive operation
             {
                 image = cvQueryFrame (capture);
-                flip(image, image, 1);
+                flip(image, image, 1);                  // To look more natural
 
+                // image - the frame captured from cam + circle around the faces
                 image = operators::detectFace(image);
                 imshow("Faces", image);
             }
@@ -265,18 +265,74 @@ int main(int argc, char** argv)
             operators::plot_binary(trainingData, trainingClasses, "Training Data");
             operators::plot_binary(testData, testClasses, "Test Data");
      
-            
-            Mat predicted = learn::mlp(trainingData, trainingClasses, testData, testClasses);
-            
-            operators::plot_binary(testData, predicted, "Predictions");
-
-            
+            mlp = learn::create_mlp(trainingData, trainingClasses, testData, testClasses);
             waitKey(10);
         }
-
-            else if (!command.compare("close")){
-                destroyAllWindows();
-                waitKey(10);
+        
+        // Read & load the classifier
+        // NOTE :  If mlp is initialized, this will overwrite it
+        else if (!command.compare("load")){
+            
+            FileStorage fs(FILENAME, FileStorage::READ); // write to file storage
+            mlp.load(FILENAME);
+            fs.release();
+        }
+        
+        // Save the classifier
+        else if (!command.compare("save")){
+            FileStorage fs(FILENAME, FileStorage::READ); // write to file storage
+            destroyAllWindows();
+            waitKey(20);
+            mlp.save(FILENAME);
+        }
+        
+            else if (!command.compare("test")){
+                
+                Mat trainingData(numTrainingPoints, 2, CV_32FC1);
+                Mat testData(numTrainingPoints, 2, CV_32FC1);
+                
+                randu(trainingData,0, 1);
+                randu(testData,0, 1);
+                
+                Mat trainingClasses = learn::labelData(trainingData);
+                Mat test = learn::getData(trainingData);
+                
+                Mat layers = Mat(4, 1, CV_32SC1);
+                
+                layers.row(0) = cv::Scalar(2);
+                layers.row(1) = cv::Scalar(10);
+                layers.row(2) = cv::Scalar(15);
+                layers.row(3) = cv::Scalar(1);
+                
+                CvANN_MLP* mlp = new CvANN_MLP;
+                CvANN_MLP_TrainParams params;
+                CvTermCriteria criteria;
+                criteria.max_iter = 100;
+                criteria.epsilon = 0.00001f;
+                criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+                params.train_method = CvANN_MLP_TrainParams::BACKPROP;
+                params.bp_dw_scale = 0.05f;
+                params.bp_moment_scale = 0.05f;
+                params.term_crit = criteria;
+                
+                mlp->create(layers);
+                
+                // train
+                mlp->train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
+                FileStorage fs;
+                
+                fs.open("1test.yml", FileStorage::WRITE);
+                if(fs.isOpened())
+                {
+                    mlp->save(FILENAME);
+                }
+                
+                fs.open("1test.yml", FileStorage::READ);
+                if(fs.isOpened()){
+                    // Insert READ code here
+                }
+                
+                fs.release();
             }
             
             else if (!command.compare("bye")){
@@ -292,3 +348,7 @@ int main(int argc, char** argv)
         waitKey(10);
         return 0;
 }
+
+
+
+

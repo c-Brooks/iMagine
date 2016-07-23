@@ -23,8 +23,9 @@ public:
     static void load_classifier(const string& filename_to_load);
     static Mat  getData(Mat points);
     static Mat  labelData(Mat src);
-    static Mat  mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses);
-    
+    static CvANN_MLP create_mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses);
+
+
 private:
     
     
