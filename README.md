@@ -8,7 +8,7 @@ My current idea is to add number recognition through the Machine Learning librar
 
 ### References
 
-[OpenCV](http://www.opencv.org).
+[OpenCV documentation](http://docs.opencv.org/2.4.13/).
 
 *Learning OpenCV* - Gary Bradski & Adrian Kaehler.
 
