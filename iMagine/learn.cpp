@@ -25,14 +25,14 @@ using namespace std;
 
 Mat learn::getData(Mat points){
     namedWindow("TEST", CV_WINDOW_AUTOSIZE);
-    Mat image = imread("3.jpg", CV_32FC1);
+    Mat image = imread("0.jpg", CV_32FC1);
     threshold(image, image, 100, 255, 0);
-    resize(image, image, Size(points.rows, points.rows));
+    resize(image, image, Size(image.rows, image.rows));
     
     // I don't know why, but I get a segmentation error 11
     //      if I don't open the image immediately.
     imshow("TEST", image);
-    destroyWindow("TEST");
+//    destroyWindow("TEST");
     waitKey(10);
     
     return image;
@@ -50,8 +50,6 @@ Mat learn::labelData(Mat points){
     }
     return labels;
 }
-
-
 
 
 

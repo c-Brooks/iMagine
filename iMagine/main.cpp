@@ -38,15 +38,18 @@ using namespace std;
 
 
 
-
 const int numTrainingPoints = 500;
 const int numTestPoints = 1000;
 const char* FILENAME =  "mlp_classifier.xml";
-//const string& FILENAME =  "/Users/corey/Desktop/iMagine/mlp_classifier.xml";
+const int classCount = 2; // So far, it recongnizes only 0 and 1
+FileStorage fs;
+
+Mat trainingData(numTrainingPoints, 2, CV_32FC1);
+Mat testData(numTestPoints, 2, CV_32FC1);
 
 string file_to_load = "";
 
-CvANN_MLP mlp;
+CvANN_MLP* mlp = new CvANN_MLP;
 
 int main(int argc, char** argv)
 {
@@ -137,7 +140,6 @@ int main(int argc, char** argv)
                 {
                     moment = moments((Mat)countours[i]);
                     area = moment.m00;
-                    
                     
                     if(area > 400  && area > areaMax)
                     {
@@ -259,83 +261,68 @@ int main(int argc, char** argv)
             randu(trainingData,0, 1);
             randu(testData,0, 1);
             
+//            Mat trainingClasses = learn::labelData(trainingData);
+//            Mat testClasses     = learn::labelData(testData);
+            
+   
+            randu(trainingData,0, 1);
+            randu(testData,0, 1);
+            
             Mat trainingClasses = learn::labelData(trainingData);
-            Mat testClasses     = learn::labelData(testData);
+            Mat testClasses     = learn::getData(testData);
+            
+            // Create layers of neural net
+            Mat layers = Mat(4, 1, CV_32SC1);
+            layers.row(0) = cv::Scalar(2);
+            layers.row(1) = cv::Scalar(10);
+            layers.row(2) = cv::Scalar(15);
+            layers.row(3) = cv::Scalar(1);
+            
+            
+            // Set parameters
+            CvANN_MLP_TrainParams params;
+            CvTermCriteria criteria;
+            criteria.max_iter = 100;
+            criteria.epsilon = 0.00001f;
+            criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+            params.train_method = CvANN_MLP_TrainParams::BACKPROP;
+            params.bp_dw_scale = 0.05f;
+            params.bp_moment_scale = 0.05f;
+            params.term_crit = criteria;
+            
+
+            mlp->create(layers);
+
+            // train
+            mlp->train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
             
             operators::plot_binary(trainingData, trainingClasses, "Training Data");
             operators::plot_binary(testData, testClasses, "Test Data");
      
-            mlp = learn::create_mlp(trainingData, trainingClasses, testData, testClasses);
             waitKey(10);
         }
         
-        // Read & load the classifier
+        // Load the classifier from xml file
         // NOTE :  If mlp is initialized, this will overwrite it
         else if (!command.compare("load")){
-            
-            FileStorage fs(FILENAME, FileStorage::READ); // write to file storage
-            mlp.load(FILENAME);
-            fs.release();
+            fs.open(FILENAME, FileStorage::READ); // read from file storage
+            if(fs.isOpened())
+                mlp->load(FILENAME);
         }
         
-        // Save the classifier
+        // Save the classifier to xml file
         else if (!command.compare("save")){
-            FileStorage fs(FILENAME, FileStorage::READ); // write to file storage
-            destroyAllWindows();
-            waitKey(20);
-            mlp.save(FILENAME);
+            fs.open(FILENAME, FileStorage::WRITE); // write to file storage
+            if(fs.isOpened())
+                mlp->save(FILENAME);
         }
         
-            else if (!command.compare("test")){
-                
-                Mat trainingData(numTrainingPoints, 2, CV_32FC1);
-                Mat testData(numTrainingPoints, 2, CV_32FC1);
-                
-                randu(trainingData,0, 1);
-                randu(testData,0, 1);
-                
-                Mat trainingClasses = learn::labelData(trainingData);
-                Mat test = learn::getData(trainingData);
-                
-                Mat layers = Mat(4, 1, CV_32SC1);
-                
-                layers.row(0) = cv::Scalar(2);
-                layers.row(1) = cv::Scalar(10);
-                layers.row(2) = cv::Scalar(15);
-                layers.row(3) = cv::Scalar(1);
-                
-                CvANN_MLP* mlp = new CvANN_MLP;
-                CvANN_MLP_TrainParams params;
-                CvTermCriteria criteria;
-                criteria.max_iter = 100;
-                criteria.epsilon = 0.00001f;
-                criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
-                params.train_method = CvANN_MLP_TrainParams::BACKPROP;
-                params.bp_dw_scale = 0.05f;
-                params.bp_moment_scale = 0.05f;
-                params.term_crit = criteria;
-                
-                mlp->create(layers);
-                
-                // train
-                mlp->train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
-                FileStorage fs;
-                
-                fs.open("1test.yml", FileStorage::WRITE);
-                if(fs.isOpened())
-                {
-                    mlp->save(FILENAME);
-                }
-                
-                fs.open("1test.yml", FileStorage::READ);
-                if(fs.isOpened()){
-                    // Insert READ code here
-                }
-                
-                fs.release();
-            }
-            
+        else if (!command.compare("predict")){
+//            mlp.predict(testData, testClasses);
+        }
+        
             else if (!command.compare("bye")){
+                fs.release();
                 destroyAllWindows();
                 waitKey(10);
                 return 0;
@@ -343,7 +330,7 @@ int main(int argc, char** argv)
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         }
-
+        fs.release();
         destroyAllWindows();
         waitKey(10);
         return 0;
