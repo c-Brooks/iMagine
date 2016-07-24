@@ -43,6 +43,9 @@ void operators::help() {
     << " set ....................... Set hue, saturation, and value for object detection. "      << endl
     << " track ..................... Tracks an object on webcam feed based on set. "             << endl
     << " draw ...................... Draws from the tracked object. Spacebar to clear drawing. " << endl
+    << " train ..................... Train a Multi-Layered Perceptron (MLP) neural network     " << endl
+    << " save ...................... Save the MLP model to an xml file "                         << endl
+    << " draw ...................... Load the MLP model from an xml file "                       << endl
     << " bye ....................... Exit iMagine"                                               << endl
     
     << "\n iMagine is created by Corey Brooks, UBC computer engineering."                        << endl

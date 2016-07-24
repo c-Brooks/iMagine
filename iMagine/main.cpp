@@ -260,14 +260,7 @@ int main(int argc, char** argv)
 
             randu(trainingData,0, 1);
             randu(testData,0, 1);
-            
-//            Mat trainingClasses = learn::labelData(trainingData);
-//            Mat testClasses     = learn::labelData(testData);
-            
-   
-            randu(trainingData,0, 1);
-            randu(testData,0, 1);
-            
+
             Mat trainingClasses = learn::labelData(trainingData);
             Mat testClasses     = learn::getData(testData);
             
@@ -296,8 +289,8 @@ int main(int argc, char** argv)
             // train
             mlp->train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
             
-            operators::plot_binary(trainingData, trainingClasses, "Training Data");
-            operators::plot_binary(testData, testClasses, "Test Data");
+//            operators::plot_binary(trainingData, trainingClasses, "Training Data");
+//            operators::plot_binary(testData, testClasses, "Test Data");
      
             waitKey(10);
         }
@@ -308,6 +301,7 @@ int main(int argc, char** argv)
             fs.open(FILENAME, FileStorage::READ); // read from file storage
             if(fs.isOpened())
                 mlp->load(FILENAME);
+            fs.release();
         }
         
         // Save the classifier to xml file
@@ -318,19 +312,23 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("predict")){
-//            mlp.predict(testData, testClasses);
+            Mat testClasses     = learn::getData(testData);
+            mlp->predict(testData, testClasses);
+            
+            operators::plot_binary(testData, testClasses, "Test Data");
+
         }
         
             else if (!command.compare("bye")){
-                fs.release();
-                destroyAllWindows();
-                waitKey(10);
+//                fs.release();
+ //               destroyAllWindows();
+    //            waitKey(10);
                 return 0;
             }
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         }
-        fs.release();
+  //      fs.release();
         destroyAllWindows();
         waitKey(10);
         return 0;
