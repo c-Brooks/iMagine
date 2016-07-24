@@ -40,7 +40,7 @@ using namespace std;
 
 const int numTrainingPoints = 500;
 const int numTestPoints = 1000;
-const char* FILENAME =  "mlp_classifier.xml";
+const char* FILENAME =  "mlp_classifier.yml";
 const int classCount = 2; // So far, it recongnizes only 0 and 1
 FileStorage fs;
 
@@ -309,6 +309,7 @@ int main(int argc, char** argv)
             fs.open(FILENAME, FileStorage::WRITE); // write to file storage
             if(fs.isOpened())
                 mlp->save(FILENAME);
+ //           fs.release();
         }
         
         else if (!command.compare("predict")){
@@ -321,14 +322,13 @@ int main(int argc, char** argv)
         
             else if (!command.compare("bye")){
 //                fs.release();
- //               destroyAllWindows();
-    //            waitKey(10);
+//                destroyAllWindows();
+//                waitKey(10);
                 return 0;
             }
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         }
-  //      fs.release();
         destroyAllWindows();
         waitKey(10);
         return 0;
