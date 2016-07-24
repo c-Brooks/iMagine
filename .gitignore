@@ -1,10 +1,7 @@
 # IGNORE #
 
-build
 *.xcodeproj
-
 .gitignore
-
 
 # IGNORE DIRECTORIES #
 
