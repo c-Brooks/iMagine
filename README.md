@@ -8,7 +8,8 @@ My current idea is to add number recognition through the Machine Learning librar
 
 ### References
 
-[OpenCV documentation](http://docs.opencv.org/2.4.13/).
+OpenCV [documentation](http://docs.opencv.org/2.4.13/).
 
 *Learning OpenCV* - Gary Bradski & Adrian Kaehler.
 
+[This dataset](http://archive.ics.uci.edu/ml/machine-learning-databases/optdigits/) of handwritten digits from UCI.

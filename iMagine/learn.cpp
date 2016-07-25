@@ -23,7 +23,7 @@ using namespace std;
 
 
 
-Mat learn::getData(Mat points){
+vector<Mat> learn::getData(Mat points){
     namedWindow("TEST", CV_WINDOW_AUTOSIZE);
     Mat image = imread("0.jpg", CV_32FC1);
     threshold(image, image, 100, 255, 0);
@@ -40,13 +40,15 @@ Mat learn::getData(Mat points){
 
 Mat learn::labelData(Mat points){
     Mat labels(points.rows, 1, CV_32FC1);
-    Mat image = learn::getData(points);
+    for (int i=0; i<2; i++){
+        Mat image = learn::getData(points).at(i);
     
     for(int i = 0; i < points.rows; i++) {
         float x = points.at<float>(i,0) * points.rows;
         float y = points.at<float>(i,1) * points.rows;
         
         labels.at<float>(i, 0) = image.at<int>(Point(x,y)) >= 0 ? -1 : 1;
+    }
     }
     return labels;
 }
@@ -89,5 +91,13 @@ CvANN_MLP learn::create_mlp(Mat trainingData, Mat trainingClasses, Mat testData,
     }
     operators::plot_binary(testData, predicted, "Predictions");
     return mlp;
+}
+
+
+Mat learn::prepareResponses(int size){
+    Mat response = Mat(200, 200, CV_32FC1);
+    for (int i=0; i<size; i++)
+        response.at<float>(0, i) = (float)i;
+    return response;
 }
 

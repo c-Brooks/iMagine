@@ -38,10 +38,12 @@ using namespace std;
 
 
 
-const int numTrainingPoints = 500;
+const int numTrainingPoints = 200;
 const int numTestPoints = 1000;
 const char* FILENAME =  "mlp_classifier.yml";
 const int classCount = 2; // So far, it recongnizes only 0 and 1
+
+Mat responses = learn::prepareResponses(classCount);
 FileStorage fs;
 
 Mat trainingData(numTrainingPoints, 2, CV_32FC1);
@@ -256,20 +258,19 @@ int main(int argc, char** argv)
             // Data contain (x,y) coordinates of random points
             // Stored as a matrix of 2x(number of data points)
             Mat trainingData(numTrainingPoints, 2, CV_32FC1);
-            Mat testData(numTestPoints, 2, CV_32FC1);
 
             randu(trainingData,0, 1);
-            randu(testData,0, 1);
+//            randu(testData,0, 1);
 
-            Mat trainingClasses = learn::labelData(trainingData);
-            Mat testClasses     = learn::getData(testData);
+//            Mat trainingClasses      = learn::labelData(trainingData);
+//            vector<Mat> testClasses  = learn::getData(testData);
             
             // Create layers of neural net
             Mat layers = Mat(4, 1, CV_32SC1);
             layers.row(0) = cv::Scalar(2);
             layers.row(1) = cv::Scalar(10);
             layers.row(2) = cv::Scalar(15);
-            layers.row(3) = cv::Scalar(1);
+            layers.row(3) = cv::Scalar(200);
             
             
             // Set parameters
@@ -287,12 +288,10 @@ int main(int argc, char** argv)
             mlp->create(layers);
 
             // train
-            mlp->train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
+            mlp->train(trainingData, responses, cv::Mat(), cv::Mat(), params);
             
 //            operators::plot_binary(trainingData, trainingClasses, "Training Data");
 //            operators::plot_binary(testData, testClasses, "Test Data");
-     
-            waitKey(10);
         }
         
         // Load the classifier from xml file
@@ -309,26 +308,33 @@ int main(int argc, char** argv)
             fs.open(FILENAME, FileStorage::WRITE); // write to file storage
             if(fs.isOpened())
                 mlp->save(FILENAME);
- //           fs.release();
         }
         
         else if (!command.compare("predict")){
-            Mat testClasses     = learn::getData(testData);
-            mlp->predict(testData, testClasses);
+            vector<Mat> testClasses     = learn::getData(testData);
+            for(int i; i<classCount; i++)
+            mlp->predict(testData, testClasses.at(i));
             
-            operators::plot_binary(testData, testClasses, "Test Data");
+//            operators::plot_binary(testData, testClasses, "Test Data");
 
         }
         
             else if (!command.compare("bye")){
-//                fs.release();
-//                destroyAllWindows();
-//                waitKey(10);
+                fs.release();
+                destroyAllWindows();
+                waitKey(10);
                 return 0;
             }
+        
+            else if (!command.compare("test")){
+            
+            
+            }
+        
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         }
+    fs.release();
         destroyAllWindows();
         waitKey(10);
         return 0;

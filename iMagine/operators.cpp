@@ -179,7 +179,7 @@ void operators::plot_binary(Mat data, Mat classes, string name) {
             cv::circle(plot, Point(x,y), 2, CV_RGB(0,255,0),1);
         }
     }
-    namedWindow(name);
+    namedWindow(name, CV_WINDOW_AUTOSIZE);
     imshow(name, plot);
 }
 
