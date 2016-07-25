@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <vector>
 #include <iostream>
-
+#include <fstream>
 
 using namespace cv;
 using namespace std;
@@ -100,4 +100,44 @@ Mat learn::prepareResponses(int size){
         response.at<float>(0, i) = (float)i;
     return response;
 }
+
+
+
+
+// Turns a single file into a vector of matrices
+// This file contains 300 samples of 32x32 binary images of digits
+//vector<vector<Mat>> prepareData(){
+void learn::prepareData(){
+    // Declare datasets
+    vector<vector<Mat>>    classEnum;   // 0, 1, 2 ... 9
+    vector<Mat>            sampleEnum;  // For each class (digit) we'll have many samples
+    Mat sample = Mat(32, 32, CV_8U);    // Matrix used for each sample
+    char valIn;
+    
+    // Read from file
+    ifstream readFile ("optdigits-orig.cv");
+
+    if(readFile.is_open())
+    {
+        while (!readFile.good()){
+    for(int row = 0; row < 32; row++){            // Height = 32
+        for (int col = 0; col < 32; col++){       // Width  = 32
+                readFile >> valIn;
+                sample.at<int>(row, col) = (int)valIn*255;
+                cout << valIn;
+                }
+            cout << endl;
+            }
+        }
+    }
+    else cout << "test failed" << endl;
+    
+    namedWindow("TEST", CV_WINDOW_AUTOSIZE);
+    imshow("TEST", sample);
+    
+    
+//   return classEnum;
+}
+
+
 

@@ -327,7 +327,7 @@ int main(int argc, char** argv)
             }
         
             else if (!command.compare("test")){
-            
+                learn::prepareData();
             
             }
         
