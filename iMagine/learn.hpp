@@ -24,10 +24,10 @@ public:
     static Mat  labelData(Mat src);
     static CvANN_MLP create_mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses);
     static Mat prepareResponses(int classSize);
-    static vector<vector<Mat>>  prepareData();
+
     
 private:
-    
+
     
 };
 

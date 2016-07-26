@@ -15,6 +15,7 @@
 
 #include "operators.hpp"
 #include "learn.hpp"
+#include "data.hpp"
 
 
 #define MAX_THRESHOLD_HUE 179
@@ -36,14 +37,16 @@ using namespace std;
  *      Keep drawing after draw is erased
  */
 
-const int sampleSize = 946;
+const int sampleSize = 30; // 946
 
 const int numTrainingPoints = 200;
 const int numTestPoints = 1000;
 const char* FILENAME =  "mlp_classifier.yml";
-const int classCount = 10; // So far, it recongnizes only 0 and 1
+const int classCount = 10;
 
-Mat responses = learn::prepareResponses(classCount);
+data trainData;
+
+//Mat responses = learn::prepareResponses(classCount);
 FileStorage fs;
 
 Mat trainingData(numTrainingPoints, 2, CV_32FC1);
@@ -272,16 +275,18 @@ int main(int argc, char** argv)
             params.bp_dw_scale = 0.05f;
             params.bp_moment_scale = 0.05f;
             params.term_crit = criteria;
-                        
+            
 
             mlp->create(layers);
             
-            vector<vector<Mat>> trainingData = learn::prepareData();
+            trainData.prepareData();
+            trainData.getTrainData();
+            
 
-
-//            for (int i = 0; i < sampleSize; i++)
-            mlp->train(trainingData.at(1).at(1), responses, Mat(), Mat(), params);
+            for (int i = 0; i < sampleSize; i++)
+                mlp->train(trainData.dataAt(i), trainData.respAt(i), Mat(), Mat(), params);
         }
+        
         
         // Load the classifier from xml file
         // NOTE :  If mlp is initialized, this will overwrite it
@@ -297,12 +302,16 @@ int main(int argc, char** argv)
             fs.open(FILENAME, FileStorage::WRITE); // write to file storage
             if(fs.isOpened())
                 mlp->save(FILENAME);
+            fs.release();
         }
         
         else if (!command.compare("predict")){
-            vector<vector<Mat>> testClasses = learn::prepareData();
-            for(int i; i<classCount; i++)
-            mlp->predict( testData, testClasses.at(i).at(i) );
+            trainData.prepareData();
+            vector<Mat>  testClasses = trainData.getTrainData();
+            
+//            for(int i; i<classCount; i++)
+//            mlp->predict( testData, testClasses.at(i).at(i) );
+ //               }
         }
         
             else if (!command.compare("bye")){
@@ -313,8 +322,8 @@ int main(int argc, char** argv)
             }
         
             else if (!command.compare("test")){
-                learn::prepareData();
-            
+
+                
             }
         
             else

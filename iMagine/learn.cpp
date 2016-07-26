@@ -21,7 +21,7 @@
 using namespace cv;
 using namespace std;
 
-
+/*
 Mat learn::labelData(Mat points){
     Mat labels(points.rows, 1, CV_32FC1);
     for (int i=0; i<2; i++){
@@ -36,7 +36,7 @@ Mat learn::labelData(Mat points){
     }
     return labels;
 }
-
+*/
 
 
 CvANN_MLP learn::create_mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses) {
@@ -78,57 +78,10 @@ CvANN_MLP learn::create_mlp(Mat trainingData, Mat trainingClasses, Mat testData,
 }
 
 
-Mat learn::prepareResponses(int size){
-    Mat response = Mat(size, 1, CV_32FC1);
-    for (int i=0; i<size; i++)
-        response.at<float>(0, i) = (float)i;
-    return response;
-}
 
 
 
 
-// Turns a single file into a vector of matrices
-// This file contains 300 samples of 32x32 binary images of digits
-vector<vector<Mat>> learn::prepareData(){
-
-// Declare datasets
-    vector<vector<Mat>>    classEnum;   // 0, 1, 2 ... 9
-    classEnum.resize(10);
-    vector<Mat>            sampleEnum;  // For each class (digit) we'll have many samples
-    Mat sample = Mat(32, 32, CV_8U);    // Matrix used for each sample
-    char valIn;
-    
-// Read from file
-    ifstream readFile ("optdigits-orig.cv");
-
-    if(readFile.is_open())
-    {
-        for(int sampleSize = 0; sampleSize < 946; sampleSize++)
-        {
-            for(int row = 0; row < 32; row++){            // Height = 32
-                for (int col = 0; col < 32; col++){       // Width  = 32
-                    readFile >> valIn;
-                    sample.at<float>(row, col) = (float)(valIn - '0')*255.0;
-                    cout << valIn;
-                }
-                cout << endl;
-            }
-        
-// Placing matrix into corresponding class
-        readFile >> valIn;
-        cout << valIn << endl;
-
-        classEnum.at(valIn - '0').push_back(sample); // minus '0' converts from ascii code to int
-        }
-    }
-    else cout << "test failed" << endl;
-    
-    namedWindow("TEST", CV_WINDOW_AUTOSIZE);
-    imshow("TEST", sample);
-
-   return classEnum;
-}
 
 
 
