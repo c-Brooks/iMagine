@@ -46,7 +46,6 @@ const int classCount = 10;
 
 data trainData;
 
-//Mat responses = learn::prepareResponses(classCount);
 FileStorage fs;
 
 Mat trainingData(numTrainingPoints, 2, CV_32FC1);
@@ -260,7 +259,7 @@ int main(int argc, char** argv)
 
             // Create layers of neural net
             Mat layers = Mat(4, 1, CV_32SC1);
-            layers.row(0) = cv::Scalar(sampleSize); // size of input
+            layers.row(0) = cv::Scalar(1024); // size of input
             layers.row(1) = cv::Scalar(10);
             layers.row(2) = cv::Scalar(15);
             layers.row(3) = cv::Scalar(classCount);
@@ -280,11 +279,10 @@ int main(int argc, char** argv)
             mlp->create(layers);
             
             trainData.prepareData();
-            trainData.getTrainData();
+            cout << trainData.getTrainData().rows << endl;
+            cout << trainData.getTrainData().cols << endl;
             
-
-            for (int i = 0; i < sampleSize; i++)
-                mlp->train(trainData.dataAt(i), trainData.respAt(i), Mat(), Mat(), params);
+                mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
         }
         
         
