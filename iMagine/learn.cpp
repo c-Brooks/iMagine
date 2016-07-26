@@ -22,26 +22,10 @@ using namespace cv;
 using namespace std;
 
 
-
-vector<Mat> learn::getData(Mat points){
-    namedWindow("TEST", CV_WINDOW_AUTOSIZE);
-    Mat image = imread("0.jpg", CV_32FC1);
-    threshold(image, image, 100, 255, 0);
-    resize(image, image, Size(image.rows, image.rows));
-    
-    // I don't know why, but I get a segmentation error 11
-    //      if I don't open the image immediately.
-    imshow("TEST", image);
-//    destroyWindow("TEST");
-    waitKey(10);
-    
-    return image;
-}
-
 Mat learn::labelData(Mat points){
     Mat labels(points.rows, 1, CV_32FC1);
     for (int i=0; i<2; i++){
-        Mat image = learn::getData(points).at(i);
+        Mat image = learn::prepareData().at(i).at(i);
     
     for(int i = 0; i < points.rows; i++) {
         float x = points.at<float>(i,0) * points.rows;
@@ -95,7 +79,7 @@ CvANN_MLP learn::create_mlp(Mat trainingData, Mat trainingClasses, Mat testData,
 
 
 Mat learn::prepareResponses(int size){
-    Mat response = Mat(200, 200, CV_32FC1);
+    Mat response = Mat(size, 1, CV_32FC1);
     for (int i=0; i<size; i++)
         response.at<float>(0, i) = (float)i;
     return response;
@@ -106,37 +90,44 @@ Mat learn::prepareResponses(int size){
 
 // Turns a single file into a vector of matrices
 // This file contains 300 samples of 32x32 binary images of digits
-//vector<vector<Mat>> prepareData(){
-void learn::prepareData(){
-    // Declare datasets
+vector<vector<Mat>> learn::prepareData(){
+
+// Declare datasets
     vector<vector<Mat>>    classEnum;   // 0, 1, 2 ... 9
+    classEnum.resize(10);
     vector<Mat>            sampleEnum;  // For each class (digit) we'll have many samples
     Mat sample = Mat(32, 32, CV_8U);    // Matrix used for each sample
     char valIn;
     
-    // Read from file
+// Read from file
     ifstream readFile ("optdigits-orig.cv");
 
     if(readFile.is_open())
     {
-        while (!readFile.good()){
-    for(int row = 0; row < 32; row++){            // Height = 32
-        for (int col = 0; col < 32; col++){       // Width  = 32
-                readFile >> valIn;
-                sample.at<int>(row, col) = (int)valIn*255;
-                cout << valIn;
+        for(int sampleSize = 0; sampleSize < 946; sampleSize++)
+        {
+            for(int row = 0; row < 32; row++){            // Height = 32
+                for (int col = 0; col < 32; col++){       // Width  = 32
+                    readFile >> valIn;
+                    sample.at<float>(row, col) = (float)(valIn - '0')*255.0;
+                    cout << valIn;
                 }
-            cout << endl;
+                cout << endl;
             }
+        
+// Placing matrix into corresponding class
+        readFile >> valIn;
+        cout << valIn << endl;
+
+        classEnum.at(valIn - '0').push_back(sample); // minus '0' converts from ascii code to int
         }
     }
     else cout << "test failed" << endl;
     
     namedWindow("TEST", CV_WINDOW_AUTOSIZE);
     imshow("TEST", sample);
-    
-    
-//   return classEnum;
+
+   return classEnum;
 }
 
 

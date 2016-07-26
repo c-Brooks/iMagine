@@ -36,12 +36,12 @@ using namespace std;
  *      Keep drawing after draw is erased
  */
 
-
+const int sampleSize = 946;
 
 const int numTrainingPoints = 200;
 const int numTestPoints = 1000;
 const char* FILENAME =  "mlp_classifier.yml";
-const int classCount = 2; // So far, it recongnizes only 0 and 1
+const int classCount = 10; // So far, it recongnizes only 0 and 1
 
 Mat responses = learn::prepareResponses(classCount);
 FileStorage fs;
@@ -254,24 +254,13 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("train") || !command.compare("t")){
-            
-            // Data contain (x,y) coordinates of random points
-            // Stored as a matrix of 2x(number of data points)
-            Mat trainingData(numTrainingPoints, 2, CV_32FC1);
 
-            randu(trainingData,0, 1);
-//            randu(testData,0, 1);
-
-//            Mat trainingClasses      = learn::labelData(trainingData);
-//            vector<Mat> testClasses  = learn::getData(testData);
-            
             // Create layers of neural net
             Mat layers = Mat(4, 1, CV_32SC1);
-            layers.row(0) = cv::Scalar(2);
+            layers.row(0) = cv::Scalar(sampleSize); // size of input
             layers.row(1) = cv::Scalar(10);
             layers.row(2) = cv::Scalar(15);
-            layers.row(3) = cv::Scalar(200);
-            
+            layers.row(3) = cv::Scalar(classCount);
             
             // Set parameters
             CvANN_MLP_TrainParams params;
@@ -283,15 +272,15 @@ int main(int argc, char** argv)
             params.bp_dw_scale = 0.05f;
             params.bp_moment_scale = 0.05f;
             params.term_crit = criteria;
-            
+                        
 
             mlp->create(layers);
-
-            // train
-            mlp->train(trainingData, responses, cv::Mat(), cv::Mat(), params);
             
-//            operators::plot_binary(trainingData, trainingClasses, "Training Data");
-//            operators::plot_binary(testData, testClasses, "Test Data");
+            vector<vector<Mat>> trainingData = learn::prepareData();
+
+
+//            for (int i = 0; i < sampleSize; i++)
+            mlp->train(trainingData.at(1).at(1), responses, Mat(), Mat(), params);
         }
         
         // Load the classifier from xml file
@@ -311,12 +300,9 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("predict")){
-            vector<Mat> testClasses     = learn::getData(testData);
+            vector<vector<Mat>> testClasses = learn::prepareData();
             for(int i; i<classCount; i++)
-            mlp->predict(testData, testClasses.at(i));
-            
-//            operators::plot_binary(testData, testClasses, "Test Data");
-
+            mlp->predict( testData, testClasses.at(i).at(i) );
         }
         
             else if (!command.compare("bye")){

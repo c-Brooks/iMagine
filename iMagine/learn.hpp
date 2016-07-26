@@ -21,12 +21,10 @@ public:
     static void train();
     static void createClassifier(const string& data_filename, const string& from_file, const string& to_file);
     static void load_classifier(const string& filename_to_load);
-    static vector<Mat>  getData(Mat points);
     static Mat  labelData(Mat src);
     static CvANN_MLP create_mlp(Mat trainingData, Mat trainingClasses, Mat testData, Mat testClasses);
     static Mat prepareResponses(int classSize);
-//    static vector<vector<Mat>> prepareData();
-      static void prepareData();
+    static vector<vector<Mat>>  prepareData();
     
 private:
     
