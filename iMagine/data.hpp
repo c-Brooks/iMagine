@@ -21,13 +21,20 @@ class data {
 private:
     Mat trainData;
     Mat trainResp;
+    Mat testData;
+    Mat testResp;
+    int sampleSize = 946;
+    
     
 public:
     void   prepareData();
     Mat    getTrainData();
     Mat    getTrainResp();
-    Mat            dataAt(int i);
-    Mat            respAt(int i);
+    Mat    getTestData();
+    Mat    getTestResp();
+    void   splitData(int fulcrum);
+    
+    
 };
 
 #endif /* data_hpp */

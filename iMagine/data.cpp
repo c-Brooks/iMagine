@@ -31,15 +31,14 @@ Mat data::getTrainData(){
 Mat data::getTrainResp(){
     return trainResp;
 }
-/*
-Mat data::dataAt(int i){
-    return trainData.at(i);
+
+Mat data::getTestData(){
+    return testData;
 }
 
-Mat data::respAt(int i){
-    return trainResp.at(i);
+Mat data::getTestResp(){
+    return testResp;
 }
-*/
 
 
 // SETTER (sets data and responses)
@@ -54,17 +53,17 @@ void data::prepareData(){ // 946
     vector<float>            respRow; // 0, 1, 2 ... 9
     respRow.resize(10);
 
-    Mat dataMat = Mat(30, 1024, CV_32F);
-    Mat respMat = Mat(30, 10, CV_32F);
+    Mat dataMat = Mat(sampleSize, 1024, CV_32F);
+    Mat respMat = Mat(sampleSize, 10, CV_32F);
     
     char valIn;
     
-    // Read from file 946
+    // Read from file
     ifstream readFile ("optdigits-orig.cv");
     
     if(readFile.is_open())
     {
-        for(int sampleCount = 0; sampleCount < 30; sampleCount++)
+        for(int sampleCount = 0; sampleCount < sampleSize; sampleCount++)
         {
             for(int i = 0; i < 1024; i++){            //  32x32 = 1024
                 readFile >> valIn;
@@ -78,11 +77,6 @@ void data::prepareData(){ // 946
             cout << sampleCount << ", " << valIn << endl;
             respMat.at<float>(sampleCount, (valIn - '0')) = 255.; // minus '0' converts from ascii code to int
             
-            
-            
-    //        dataMat.row(sampleCount) = dataRow;
-//            dataRow.copyTo
- //           respMat.push_back(respRow);
         }
     }
     else cout << "test failed" << endl;
@@ -92,7 +86,34 @@ void data::prepareData(){ // 946
     data::trainResp = respMat;
 }
 
+//  Splits data for testing accuracy
+// Assumes there all samples are in data::trainData
 
+\
+void data::splitData(int fulcrum){
+    Mat trainDataBuf  = Mat(800, 1024, CV_32F);                       // buffer for training data vectors
+    Mat testDataBuf   = Mat(146, 1024, CV_32F);     // buffer for testing data vectors
+    Mat trainRespBuf  = Mat(800, 1024, CV_32F);                       // buffer for training response vectors
+    Mat testRespBuf   = Mat(146, 1024, CV_32F);     // buffer for testing response vectors
+
+    
+    for(int i = 0; i < sampleSize; i++){
+        if(i < fulcrum){
+           
+            trainDataBuf.row(i).copyTo(trainData.row(i));
+            trainRespBuf.row(i).copyTo(trainResp.row(i));
+        }
+        else {
+    //        testDataBuf.row(fulcrum).copyTo(testData.row(i - fulcrum));
+  //          testDataBuf.row(i).copyTo(testResp.row(i - fulcrum));
+        }
+  
+ }
+ 
+    
+    
+    
+}
 
 
 

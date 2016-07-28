@@ -37,7 +37,7 @@ using namespace std;
  *      Keep drawing after draw is erased
  */
 
-const int sampleSize = 30; // 946
+const int sampleSize = 946;
 
 const int numTrainingPoints = 200;
 const int numTestPoints = 1000;
@@ -47,9 +47,6 @@ const int classCount = 10;
 data trainData;
 
 FileStorage fs;
-
-Mat trainingData(numTrainingPoints, 2, CV_32FC1);
-Mat testData(numTestPoints, 2, CV_32FC1);
 
 string file_to_load = "";
 
@@ -279,10 +276,8 @@ int main(int argc, char** argv)
             mlp->create(layers);
             
             trainData.prepareData();
-            cout << trainData.getTrainData().rows << endl;
-            cout << trainData.getTrainData().cols << endl;
-            
-                mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
+
+            mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
         }
         
         
@@ -304,12 +299,20 @@ int main(int argc, char** argv)
         }
         
         else if (!command.compare("predict")){
-            trainData.prepareData();
-            vector<Mat>  testClasses = trainData.getTrainData();
+            data testData;
+            data trainData;
             
-//            for(int i; i<classCount; i++)
-//            mlp->predict( testData, testClasses.at(i).at(i) );
- //               }
+            trainData.prepareData();
+            
+
+            Mat  testClasses = trainData.getTrainResp();
+            
+            mlp->predict( testData.getTrainData(), testClasses );
+            
+            
+            
+            
+
         }
         
             else if (!command.compare("bye")){
@@ -319,15 +322,65 @@ int main(int argc, char** argv)
                 return 0;
             }
         
+        // TEST
+        // Split data randomly, train on a portion of the data and then classify the rest.
+        // Try and find the one with the smallest error rate
             else if (!command.compare("test")){
-
                 
+                
+                data testData;
+                
+                testData.prepareData();
+                testData.splitData(sampleSize/2);
+                
+                cout << "tst" << endl;
+                
+     //           Mat  testClasses = trainData.getTrainResp();
+   //             Mat  prediction = Mat(sampleSize, classCount, CV_32F);
+                
+                
+                // Create layers of neural net
+                Mat layers = Mat(4, 1, CV_32SC1);
+                layers.row(0) = cv::Scalar(1024); // size of input
+                layers.row(1) = cv::Scalar(10);
+                layers.row(2) = cv::Scalar(15);
+                layers.row(3) = cv::Scalar(classCount);
+                
+                // Set parameters
+                CvANN_MLP_TrainParams params;
+                CvTermCriteria criteria;
+                criteria.max_iter = 100;
+                criteria.epsilon = 0.00001f;
+                criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+                params.train_method = CvANN_MLP_TrainParams::BACKPROP;
+                params.bp_dw_scale = 0.05f;
+                params.bp_moment_scale = 0.05f;
+                params.term_crit = criteria;
+                
+                mlp->create(layers);
+                
+                mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
+                
+                cout << testData.getTestData().rows << endl;
+        //        cout << testClasses.rows << endl;
+                
+          //      mlp->predict(testData.getTestData(), testClasses);
+             /*
+                double maxVal;
+                for(int i=0; i < sampleSize; i++){
+                    minMaxLoc(prediction.row(i), nullptr, &maxVal);
+                    
+                    
+            
+                cout << maxVal << endl;
+              */
+                ///}
             }
-        
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         }
-    fs.release();
+        delete mlp;
+        fs.release();
         destroyAllWindows();
         waitKey(10);
         return 0;
