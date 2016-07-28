@@ -89,30 +89,27 @@ void data::prepareData(){ // 946
 //  Splits data for testing accuracy
 // Assumes there all samples are in data::trainData
 
-\
-void data::splitData(int fulcrum){
-    Mat trainDataBuf  = Mat(800, 1024, CV_32F);                       // buffer for training data vectors
-    Mat testDataBuf   = Mat(146, 1024, CV_32F);     // buffer for testing data vectors
-    Mat trainRespBuf  = Mat(800, 1024, CV_32F);                       // buffer for training response vectors
-    Mat testRespBuf   = Mat(146, 1024, CV_32F);     // buffer for testing response vectors
 
-    
-    for(int i = 0; i < sampleSize; i++){
-        if(i < fulcrum){
-           
-            trainDataBuf.row(i).copyTo(trainData.row(i));
-            trainRespBuf.row(i).copyTo(trainResp.row(i));
+void data::splitData(int fulcrum){
+    Mat trainDataBuf  = Mat(800, 1024, CV_32F);     // buffer for training data vectors
+    Mat testDataBuf   = Mat(146, 1024, CV_32F);     // buffer for testing data vectors
+    Mat trainRespBuf  = Mat(800, 10, CV_32F);       // buffer for training response vectors
+    Mat testRespBuf   = Mat(146, 10, CV_32F);       // buffer for testing response vectors
+
+    Mat newTrainData = trainData;
+    Mat newTrainResp = trainResp;
+
+    for(int i = 0; i < 800; i++){
+        if(i < 800){
+            trainDataBuf.row(i).copyTo(newTrainData.row(i));
+            trainRespBuf.row(i).copyTo(newTrainResp.row(i));
         }
         else {
-    //        testDataBuf.row(fulcrum).copyTo(testData.row(i - fulcrum));
-  //          testDataBuf.row(i).copyTo(testResp.row(i - fulcrum));
+            testDataBuf.row(i-800).copyTo(testData.row(i));
+            testRespBuf.row(i-800).copyTo(testResp.row(i));
         }
   
  }
- 
-    
-    
-    
 }
 
 
