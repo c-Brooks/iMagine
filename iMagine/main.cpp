@@ -39,8 +39,7 @@ using namespace std;
 
 const int sampleSize = 946;
 
-const int numTrainingPoints = 200;
-const int numTestPoints = 1000;
+
 const char* FILENAME =  "mlp_classifier.yml";
 const int classCount = 10;
 
@@ -331,12 +330,11 @@ int main(int argc, char** argv)
                 data testData;
                 
                 testData.prepareData();
+                
                 testData.splitData(sampleSize/2);
                 
-                cout << "tst" << endl;
+                Mat  prediction = Mat(sampleSize, classCount, CV_32F);
                 
-     //           Mat  testClasses = trainData.getTrainResp();
-   //             Mat  prediction = Mat(sampleSize, classCount, CV_32F);
                 
                 
                 // Create layers of neural net
@@ -360,21 +358,28 @@ int main(int argc, char** argv)
                 mlp->create(layers);
                 
                 mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
+                        
+                cout << prediction << endl;
                 
-                cout << testData.getTestData().rows << endl;
-        //        cout << testClasses.rows << endl;
                 
-          //      mlp->predict(testData.getTestData(), testClasses);
-             /*
-                double maxVal;
-                for(int i=0; i < sampleSize; i++){
-                    minMaxLoc(prediction.row(i), nullptr, &maxVal);
-                    
-                    
-            
-                cout << maxVal << endl;
-              */
-                ///}
+                
+                /*
+                for(int i=0; i < prediction.rows; i++)
+                {
+                    for (int j = 0; j < classCount; j++)
+                    {
+                        cout << prediction.at<float>(i,j) << endl;
+                        if (prediction.at<float>(i,j) == 255)
+                        {
+                            cout << j << endl;
+                            break;
+                        }
+                    }
+                    cout << " ----- " << endl;
+
+                }
+                
+                */
             }
             else
                 cout << " Not a valid command.\n For help, type help." << endl;

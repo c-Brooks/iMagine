@@ -45,7 +45,7 @@ Mat data::getTestResp(){
 // Turns a single file into a vector of matrices
 // This file contains 300 samples of 32x32 binary images of digits
 
-void data::prepareData(){ // 946
+void data::prepareData(){ // Sample size = 946
     
     // Declare datasets
     vector<float>            dataRow; // Vector representation of 32x32 image
@@ -82,14 +82,17 @@ void data::prepareData(){ // 946
     else cout << "test failed" << endl;
     readFile.close();
     
-    data::trainData = dataMat;
-    data::trainResp = respMat;
+    cout << dataMat;
+    cout << respMat;
+    
+    trainData = dataMat;
+    trainResp = respMat;
 }
 
 //  Splits data for testing accuracy
 // Assumes there all samples are in data::trainData
 
-
+// TODO: fulcrum wont work because Mat size needs to be const
 void data::splitData(int fulcrum){
     Mat trainDataBuf  = Mat(800, 1024, CV_32F);     // buffer for training data vectors
     Mat testDataBuf   = Mat(146, 1024, CV_32F);     // buffer for testing data vectors
@@ -99,19 +102,30 @@ void data::splitData(int fulcrum){
     Mat newTrainData = trainData;
     Mat newTrainResp = trainResp;
 
+    // Rows 0 - 799 will be used to train the classifier (trainData)
+    // Rows 800 - 946 will test the accuracy of the classifier (testData)
+    
     for(int i = 0; i < 800; i++){
         if(i < 800){
-            trainDataBuf.row(i).copyTo(newTrainData.row(i));
-            trainRespBuf.row(i).copyTo(newTrainResp.row(i));
+            newTrainData.row(i).copyTo(trainDataBuf.row(i));
+            newTrainResp.row(i).copyTo(trainRespBuf.row(i));
         }
         else {
-            testDataBuf.row(i-800).copyTo(testData.row(i));
-            testRespBuf.row(i-800).copyTo(testResp.row(i));
+            newTrainData.row(i-800).copyTo(testDataBuf.row(i));
+            newTrainResp.row(i-800).copyTo(testRespBuf.row(i));
         }
-  
- }
+        
+    }
+    trainData = trainDataBuf;
+    trainResp = trainRespBuf;
+    testData = testDataBuf;
+    testResp = testRespBuf;
+
 }
 
+void data::printData(){
+    cout << trainData;
+}
 
 
 

@@ -33,7 +33,7 @@ public:
     Mat    getTestData();
     Mat    getTestResp();
     void   splitData(int fulcrum);
-    
+    void   printData(); // FOR TESTING
     
 };
 
