@@ -306,12 +306,8 @@ int main(int argc, char** argv)
 
             Mat  testClasses = trainData.getTrainResp();
             
-            mlp->predict( testData.getTrainData(), testClasses );
+            mlp->predict( trainData.getTrainData(), testClasses );
             
-            
-            
-            
-
         }
         
             else if (!command.compare("bye")){
@@ -333,8 +329,11 @@ int main(int argc, char** argv)
                 
                 testData.splitData(sampleSize/2);
                 
-                Mat  prediction = Mat(sampleSize, classCount, CV_32F);
+                Mat  prediction = Mat(146, classCount, CV_32F); // Responses for test data
                 
+                
+             //   cout << "testData: " << testData.getTestData() << endl << "TESTDATA" << endl;
+               // testData.printData();
                 
                 
                 // Create layers of neural net
@@ -357,11 +356,11 @@ int main(int argc, char** argv)
                 
                 mlp->create(layers);
                 
-                mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
-                        
+                mlp->train(testData.getTrainData(), testData.getTrainResp(), Mat(), Mat(), params);//CvANN_MLP::NO_INPUT_SCALE);
+
+                mlp->predict(testData.getTestData(), prediction);
+                
                 cout << prediction << endl;
-                
-                
                 
                 /*
                 for(int i=0; i < prediction.rows; i++)
@@ -378,11 +377,12 @@ int main(int argc, char** argv)
                     cout << " ----- " << endl;
 
                 }
-                
-                */
+                 */
             }
+                 
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
+        
         }
         delete mlp;
         fs.release();

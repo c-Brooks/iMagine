@@ -68,22 +68,16 @@ void data::prepareData(){ // Sample size = 946
             for(int i = 0; i < 1024; i++){            //  32x32 = 1024
                 readFile >> valIn;
                 dataMat.at<float>(sampleCount, i) = ((float)(valIn - '0'))*255.0;
-                cout << valIn;
             }
-            cout << endl;
             
             // Placing matrix into corresponding class
             readFile >> valIn;
-            cout << sampleCount << ", " << valIn << endl;
             respMat.at<float>(sampleCount, (valIn - '0')) = 255.; // minus '0' converts from ascii code to int
             
         }
     }
     else cout << "test failed" << endl;
     readFile.close();
-    
-    cout << dataMat;
-    cout << respMat;
     
     trainData = dataMat;
     trainResp = respMat;
@@ -93,6 +87,8 @@ void data::prepareData(){ // Sample size = 946
 // Assumes there all samples are in data::trainData
 
 // TODO: fulcrum wont work because Mat size needs to be const
+// I just hardcoded the #s. change this soon.
+
 void data::splitData(int fulcrum){
     Mat trainDataBuf  = Mat(800, 1024, CV_32F);     // buffer for training data vectors
     Mat testDataBuf   = Mat(146, 1024, CV_32F);     // buffer for testing data vectors
@@ -102,29 +98,36 @@ void data::splitData(int fulcrum){
     Mat newTrainData = trainData;
     Mat newTrainResp = trainResp;
 
+    //cout << newTrainData.row(5) << endl;
+    //cout << newTrainResp.row(5) << endl;
+    
     // Rows 0 - 799 will be used to train the classifier (trainData)
     // Rows 800 - 946 will test the accuracy of the classifier (testData)
     
-    for(int i = 0; i < 800; i++){
+    for(int i = 0; i < 946; i++){
         if(i < 800){
             newTrainData.row(i).copyTo(trainDataBuf.row(i));
             newTrainResp.row(i).copyTo(trainRespBuf.row(i));
         }
         else {
-            newTrainData.row(i-800).copyTo(testDataBuf.row(i));
-            newTrainResp.row(i-800).copyTo(testRespBuf.row(i));
+            newTrainData.row(i).copyTo(testDataBuf.row(i-800));
+            newTrainResp.row(i).copyTo(testRespBuf.row(i-800));
         }
         
     }
+
     trainData = trainDataBuf;
     trainResp = trainRespBuf;
-    testData = testDataBuf;
-    testResp = testRespBuf;
-
+    testData  = testDataBuf;
+    testResp  = testRespBuf;
 }
 
 void data::printData(){
-    cout << trainData;
+//    cout << "trainData " << trainData.rows << endl;
+//    cout << "trainresp " << trainResp << endl;
+    cout << "testData " << testData << endl;
+//    cout << "testResp " << testResp << endl;
+    
 }
 
 
