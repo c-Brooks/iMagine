@@ -362,13 +362,12 @@ int main(int argc, char** argv)
                 
                 cout << prediction << endl;
                 
-                /*
+                
                 for(int i=0; i < prediction.rows; i++)
                 {
                     for (int j = 0; j < classCount; j++)
                     {
-                        cout << prediction.at<float>(i,j) << endl;
-                        if (prediction.at<float>(i,j) == 255)
+                        if (prediction.at<float>(i,j) > 100)
                         {
                             cout << j << endl;
                             break;
@@ -377,7 +376,7 @@ int main(int argc, char** argv)
                     cout << " ----- " << endl;
 
                 }
-                 */
+                
             }
                  
             else
