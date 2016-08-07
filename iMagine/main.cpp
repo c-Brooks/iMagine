@@ -356,24 +356,33 @@ int main(int argc, char** argv)
                 
                 mlp->create(layers);
                 
-                mlp->train(testData.getTrainData(), testData.getTrainResp(), Mat(), Mat(), params);//CvANN_MLP::NO_INPUT_SCALE);
+                mlp->train(testData.getTrainData(), testData.getTrainResp(), Mat(), Mat(), params);
 
                 mlp->predict(testData.getTestData(), prediction);
                 
-                cout << prediction << endl;
+                int maxVal = 0, tempResp = 0;
+                float accuracy;
                 
-                
+                // Print out predictions
                 for(int i=0; i < prediction.rows; i++)
                 {
                     for (int j = 0; j < classCount; j++)
                     {
-                        if (prediction.at<float>(i,j) > 100)
-                        {
-                            cout << j << endl;
-                            break;
+                        if(prediction.at<float>(i,j) > maxVal){
+                            maxVal = prediction.at<float>(i,j);
+                            tempResp = j;
                         }
+                    //    if(maxVal > 230) break;
+                        
                     }
-                    cout << " ----- " << endl;
+                    
+                    cout << tempResp << ", ";
+
+                    // Figure out the certainty of classification
+                    
+                    cout << (abs(maxVal - 255)) << endl;
+                    
+                    maxVal = 0;
 
                 }
                 
