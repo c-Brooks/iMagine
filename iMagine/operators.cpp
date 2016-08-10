@@ -60,10 +60,10 @@ Mat operators::morphOps(Mat src){
     Mat dilateElem = getStructuringElement(MORPH_RECT, Size(8,8));
     
     dilate(src, src, dilateElem);
-    erode(src, src, erodeElem);
-    
-    erode(src, src, erodeElem);
     dilate(src, src, dilateElem);
+
+    erode(src, src, erodeElem);
+    erode(src, src, erodeElem);
     
     return src;
 }

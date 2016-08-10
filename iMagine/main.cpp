@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     Mat gray, hsv, thresh, imFinal;
     int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL;
 
-    vector<vector<Point>> countours;
+    vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
     Moments moment;
     double area, areaMax = 0.0;
@@ -112,6 +112,10 @@ int main(int argc, char** argv)
             }
         }
         
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
+        
         // TRACK
         //  After setting HSV, the image is tracked by finding the largest area of whitespace
         
@@ -131,14 +135,14 @@ int main(int argc, char** argv)
             
             imFinal = operators::morphOps(thresh);
 
-            findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+            findContours(imFinal, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
             if(numObj > 0)
             {
                 for(int i = 0; i < numObj; i++)
                 {
-                    moment = moments((Mat)countours[i]);
+                    moment = moments((Mat)contours[i]);
                     area = moment.m00;
                     
                     if(area > 400  && area > areaMax)
@@ -162,6 +166,10 @@ int main(int argc, char** argv)
             }
         }
     }
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
         
         // DRAW
         //  Uses the tracked object as a pen
@@ -188,14 +196,14 @@ int main(int argc, char** argv)
             
             imFinal = operators::morphOps(thresh);
         
-            findContours(imFinal, countours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+            findContours(imFinal, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
             
             if(numObj > 0)
             {
                 for(int i = 0; i < numObj; i++)
                 {
-                    moment = moments((Mat)countours[i]);
+                    moment = moments((Mat)contours[i]);
                     area = moment.m00;
                     
                     // Find the largest area of white pixels
@@ -229,6 +237,10 @@ int main(int argc, char** argv)
         destroyAllWindows();
         waitKey(10);
         }
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
 
         // Face Detection using Haar Cascade
         
@@ -250,6 +262,10 @@ int main(int argc, char** argv)
             destroyAllWindows();
             waitKey(10);
         }
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
         
         else if (!command.compare("train") || !command.compare("t")){
 
@@ -279,6 +295,9 @@ int main(int argc, char** argv)
             mlp->train(trainData.getTrainData(), trainData.getTrainResp(), Mat(), Mat(), params);
         }
         
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
         
         // Load the classifier from xml file
         // NOTE :  If mlp is initialized, this will overwrite it
@@ -297,18 +316,80 @@ int main(int argc, char** argv)
             fs.release();
         }
         
-        else if (!command.compare("predict")){
-            data testData;
-            data trainData;
-            
-            trainData.prepareData();
-            
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
 
-            Mat  testClasses = trainData.getTrainResp();
+        
+        
+        // PREDICT
+        // Given an input image (from webcam), determine which number is shown
+        
+        //    FLOW:   RECOGNIZE SHAPE ( high b/w contrast? ) -> PREPROCESS, CROP & RESIZE -> CLASSIFY BINARY 32x32 MATRIX
+        
+        
+        else if (!command.compare("predict") || !command.compare("p")){
+            // Display webcam
+            CvCapture *capture = cvCreateCameraCapture(0);
+            cvStartWindowThread();
+            cvNamedWindow ("Image", CV_WINDOW_AUTOSIZE);
             
-            mlp->predict( trainData.getTrainData(), testClasses );
+            while (!(cvWaitKey(10) == 32)) {        // Until spacebar is pressed
+                image = cvQueryFrame (capture);
+                cvtColor(image, image, CV_BGR2HSV);
+                inRange(image, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), image);
+
+                imshow("Image", image);
+            }
+            // Do operations on image
+            operators::morphOps(image);
+
             
+            vector<RotatedRect> minRect(contours.size()); // Smallest rectangle to encapsulate number
+            
+            int imax = 0; // Change this name it's dumb
+            int extTop, extBot, extRt, extLeft;
+            
+            
+            findContours(imFinal, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+            int numObj = (int) hierarchy.size();
+            
+            if(numObj > 0)
+            {
+                for(int i = 0; i < numObj; i++)
+                {
+                    moment = moments((Mat)contours[i]);
+                    area = moment.m00;
+                    
+                    if(area > 400  && area > areaMax)
+                    {
+                        x = moment.m10/area;
+                        y = moment.m01/area;
+                        areaMax = area;
+                        imax = i;
+                    }
+                }
+                
+                
+                Rect boundRect = boundingRect(contours[imax]);
+                rectangle(image, boundRect.tl(), boundRect.br(), Scalar(0,0,255));
+                
+                imshow("Image", image);
+                
+            }
+
+                
+                
+                
+                
+            
+        
+            destroyAllWindows();
         }
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
+        
         
             else if (!command.compare("bye")){
                 fs.release();
