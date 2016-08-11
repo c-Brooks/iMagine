@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     cout << " For help, type 'help' \n" << endl;
     
     Mat gray, hsv, thresh, imFinal;
-    int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL;
+    int h_min = 0, h_max = MAX_THRESHOLD_HUE, s_min = 0, s_max = MAX_THRESHOLD_SAT, v_min = 0, v_max = MAX_THRESHOLD_VAL/2;
 
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -327,7 +327,8 @@ int main(int argc, char** argv)
         //    FLOW:   RECOGNIZE SHAPE ( high b/w contrast? ) -> PREPROCESS, CROP & RESIZE -> CLASSIFY BINARY 32x32 MATRIX
         
         
-        else if (!command.compare("predict") || !command.compare("p")){
+        else if (!command.compare("predict") || !command.compare("p"))
+        {
             // Display webcam
             CvCapture *capture = cvCreateCameraCapture(0);
             cvStartWindowThread();
@@ -340,19 +341,19 @@ int main(int argc, char** argv)
 
                 imshow("Image", image);
             }
+            
             // Do operations on image
-            operators::morphOps(image);
+            Mat imWork = operators::morphOps(image.clone()); // The working image
 
             
-            vector<RotatedRect> minRect(contours.size()); // Smallest rectangle to encapsulate number
             
             int imax = 0; // Change this name it's dumb
-            int extTop, extBot, extRt, extLeft;
+//            int extTop, extBot, extRt, extLeft;
             
-            
-            findContours(imFinal, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+          
+            findContours(imWork, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
             int numObj = (int) hierarchy.size();
-            
+
             if(numObj > 0)
             {
                 for(int i = 0; i < numObj; i++)
@@ -368,22 +369,20 @@ int main(int argc, char** argv)
                         imax = i;
                     }
                 }
-                
-                
-                Rect boundRect = boundingRect(contours[imax]);
-                rectangle(image, boundRect.tl(), boundRect.br(), Scalar(0,0,255));
-                
-                imshow("Image", image);
-                
             }
+            
+                Rect boundRect = boundingRect(contours[imax]);
+                rectangle(image, boundRect.tl(), boundRect.br(), Scalar(0,0,100));
+  //              rectangle(image, 200, 200, Scalar(0,0,100));
 
-                
-                
-                
+        
+                while (waitKey(10) != 27)
+                    imshow("Image", image);
                 
             
         
-            destroyAllWindows();
+                destroyAllWindows();
+                waitKey(10);
         }
         
         // ----------------------------------------------------------------------------------------------------------------------------------------- //
@@ -411,11 +410,6 @@ int main(int argc, char** argv)
                 testData.splitData(sampleSize/2);
                 
                 Mat  prediction = Mat(146, classCount, CV_32F); // Responses for test data
-                
-                
-             //   cout << "testData: " << testData.getTestData() << endl << "TESTDATA" << endl;
-               // testData.printData();
-                
                 
                 // Create layers of neural net
                 Mat layers = Mat(4, 1, CV_32SC1);
