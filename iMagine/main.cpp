@@ -329,6 +329,7 @@ int main(int argc, char** argv)
         
         else if (!command.compare("predict") || !command.compare("p"))
         {
+            Mat showIm;
             // Display webcam
             CvCapture *capture = cvCreateCameraCapture(0);
             cvStartWindowThread();
@@ -336,6 +337,8 @@ int main(int argc, char** argv)
             
             while (!(cvWaitKey(10) == 32)) {        // Until spacebar is pressed
                 image = cvQueryFrame (capture);
+                showIm = image.clone();
+                
                 cvtColor(image, image, CV_BGR2HSV);
                 inRange(image, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), image);
 
@@ -371,14 +374,20 @@ int main(int argc, char** argv)
                 }
             }
             
-                Rect boundRect = boundingRect(contours[imax]);
-                rectangle(image, boundRect.tl(), boundRect.br(), Scalar(0,0,100));
-  //              rectangle(image, 200, 200, Scalar(0,0,100));
+            Rect boundRect = boundingRect(contours[imax]);
+            rectangle(showIm, boundRect.tl(), boundRect.br(), Scalar(0,0,255));
+            circle(showIm, boundRect.tl(), 100, Scalar(0,0,255));
+            circle(showIm, boundRect.br(), 100, Scalar(0,0,255));
 
-        
-                while (waitKey(10) != 27)
-                    imshow("Image", image);
-                
+            Mat cropIm = image(boundRect);
+            resize(cropIm, cropIm, Size(32,32));
+            cvNamedWindow("Cropped");
+            
+            
+            while (waitKey(10) != 27){
+                imshow("Image", showIm);
+                imshow("Cropped", cropIm);
+            }
             
         
                 destroyAllWindows();
