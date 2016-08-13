@@ -316,6 +316,11 @@ int main(int argc, char** argv)
             fs.release();
         }
         
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------- SAVE ------------------------------------------------------------------ //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        
+        
         // Save the classifier to xml file
         else if (!command.compare("save")){
             fs.open(FILENAME, FileStorage::WRITE); // write to file storage
@@ -331,8 +336,6 @@ int main(int argc, char** argv)
         
         // PREDICT
         // Given an input image (from webcam), determine which number is shown
-        
-        //    FLOW:   RECOGNIZE SHAPE ( high b/w contrast? ) -> PREPROCESS, CROP & RESIZE -> CLASSIFY BINARY 32x32 MATRIX
         
         
         else if (!command.compare("predict") || !command.compare("p"))
@@ -353,10 +356,9 @@ int main(int argc, char** argv)
                 imshow("Image", image);
             }
             
-            // Do operations on image
+            // Preprocess image using morphological operations
             Mat imWork = operators::morphOps(image.clone()); // The working image
 
-            
             
             int imax = 0; // Change this name it's dumb
           
@@ -395,27 +397,12 @@ int main(int argc, char** argv)
                 imshow("Cropped", cropIm);
             }
             
-            cout << cropIm << endl;
             
-            /*
-            // 32x32 matrix -> 1x1024 matrix
-            Mat classMat = Mat(1, 1024, CV_32FC1);
-            cout << "  ";
-            for (int y = 0; y < 32; y++){
-                for (int x = 0; x < 32; x++){
-                    //classMat.at<float>(0,x+y*32) = cropIm.at<float>(x,y);
-                    cout << (int)cropIm.at<float>(x,y)<< ", ";
-                }
-            }
-            */
-            
-            Mat classMat = Mat(1, 1024, CV_32FC1);
-            classMat = cropIm.reshape(0, 1);
-            
+            // Prepare matrices
+            Mat classMat = cropIm.reshape(0, 1);
+            classMat.convertTo(classMat, CV_32FC1);
             Mat resp = Mat(1, classCount, CV_32FC1);
 
-            classMat.convertTo(classMat, CV_32FC1);
-            cout << classMat.type() << ", " << resp.type() << endl;
             
             mlp->predict(classMat, resp);
             
@@ -437,17 +424,9 @@ int main(int argc, char** argv)
         
         
         // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------- TEST ------------------------------------------------------------------ //
         // ----------------------------------------------------------------------------------------------------------------------------------------- //
-        // ----------------------------------------------------------------------------------------------------------------------------------------- //
-
         
-        
-            else if (!command.compare("bye")){
-                fs.release();
-                destroyAllWindows();
-                waitKey(10);
-                return 0;
-            }
         
         // TEST
         // Split data randomly, train on a portion of the data and then classify the rest.
@@ -508,7 +487,24 @@ int main(int argc, char** argv)
                     maxVal = 0;
                 }
             }
-                 
+        
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------- BYE ------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+
+        
+            else if (!command.compare("bye")){
+                fs.release();
+                destroyAllWindows();
+                waitKey(10);
+                return 0;
+            }
+        
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        // ----------------------------------------------------------------------------------------------------------------------------------------- //
+        
             else
                 cout << " Not a valid command.\n For help, type help." << endl;
         
