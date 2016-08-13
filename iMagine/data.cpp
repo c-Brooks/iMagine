@@ -98,9 +98,6 @@ void data::splitData(int fulcrum){
     Mat newTrainData = trainData;
     Mat newTrainResp = trainResp;
 
-    //cout << newTrainData.row(5) << endl;
-    //cout << newTrainResp.row(5) << endl;
-    
     // Rows 0 - 799 will be used to train the classifier (trainData)
     // Rows 800 - 946 will test the accuracy of the classifier (testData)
     
